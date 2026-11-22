@@ -21,6 +21,7 @@ import { TableQuadrantStack } from '../quadrant/TableQuadrantStack.tsx';
 import type { BP_BodyContextMenuRenderer } from '../common/menu-context.ts';
 import type {
   BP_RowData,
+  BP_BodyPropsOptions,
   BP_RowExpanderOptions,
   BP_RowDetailRenderer,
   BP_TableInstance,
@@ -32,7 +33,7 @@ import type { TableLayout } from '../common/dimensions.ts';
 export type TableContainerProps<TData extends BP_RowData> = HTMLPropsRef<HTMLDivElement> &
   TableLayout &
   TableLoading &
-  BP_RowExpanderOptions<TData> &
+  BP_BodyPropsOptions<TData> & BP_RowExpanderOptions<TData> &
   Pick<
     RowVirtualizerOptions<TData>,
     'enableRowVirtualization' | 'overscanRowCount'
@@ -66,6 +67,7 @@ export type TableContainerProps<TData extends BP_RowData> = HTMLPropsRef<HTMLDiv
 export function TableContainer<TData extends BP_RowData>({
   table,
   renderRowDetail,
+  getCellProps,
   rowExpanderButtonProps,
   rowExpanderIconProps,
   rowDetailHeight,
@@ -181,6 +183,7 @@ export function TableContainer<TData extends BP_RowData>({
       <TableQuadrantStack
         table={table}
         renderRowDetail={renderRowDetail}
+        getCellProps={getCellProps}
         rowExpanderButtonProps={rowExpanderButtonProps}
         rowExpanderIconProps={rowExpanderIconProps}
         rowHeaderWidth={rowHeaderWidth}

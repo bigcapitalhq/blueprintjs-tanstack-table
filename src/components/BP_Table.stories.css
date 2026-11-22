@@ -63,3 +63,7 @@
 .bp-table-demo-head-centered .bp6-table-column-name-text {
   text-align: center;
 }
+
+.bp6-table-cell.account-inactive {
+  opacity: 0.6;
+}

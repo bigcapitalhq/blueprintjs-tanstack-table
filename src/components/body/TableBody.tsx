@@ -19,6 +19,7 @@ import type { BP_RowVirtualizer } from '../../hooks/use-row-virtualizer.ts';
 import type { RowResizingApi } from '../../hooks/use-row-resizing.ts';
 import type {
   BP_RowData,
+  BP_BodyPropsOptions,
   BP_RowExpanderOptions,
   BP_RowDetailRenderer,
   BP_TableInstance,
@@ -29,7 +30,7 @@ import { TableGhostCells } from './TableGhostCells.tsx';
 import { TableRegionLayer } from '../layers/TableRegionLayer.tsx';
 import { useTableSelection } from '../common/table-selection-context.ts';
 
-export type TableBodyProps<TData extends BP_RowData> = HTMLPropsRef<HTMLDivElement> & BP_RowExpanderOptions<TData> & {
+export type TableBodyProps<TData extends BP_RowData> = HTMLPropsRef<HTMLDivElement> & BP_BodyPropsOptions<TData> & BP_RowExpanderOptions<TData> & {
   table: BP_TableInstance<TData>;
   renderRowDetail?: BP_RowDetailRenderer<TData>;
   /** Which column region this body renders: frozen ("start") or scrollable ("center"). */
@@ -57,6 +58,7 @@ export type TableBodyProps<TData extends BP_RowData> = HTMLPropsRef<HTMLDivEleme
 export function TableBody<TData extends BP_RowData>({
   table,
   renderRowDetail,
+  getCellProps,
   rowExpanderButtonProps,
   rowExpanderIconProps,
   columnRegion,
@@ -130,6 +132,7 @@ export function TableBody<TData extends BP_RowData>({
                       key={cell.id}
                       table={table}
                       cell={cell}
+                      cellProps={getCellProps?.(cell)}
                       rowExpanderButtonProps={rowExpanderButtonProps}
                       rowExpanderIconProps={rowExpanderIconProps}
                       isExpansionCell={columnRegion === firstColumnRegion && columnIndex === 0}
