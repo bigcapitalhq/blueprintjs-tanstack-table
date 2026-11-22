@@ -21,18 +21,13 @@ for all borders with minimal duplication. See the bottom of this file.
     box-shadow: 0 0 0 $border-width $border-color;
   }
 
-  .#{$ns}-table-menu {
-    box-shadow: $border-bottom-default, $border-right-default;
-  }
-
-  .#{$ns}-table-row-selection-header-cell {
-    box-shadow: $border-bottom-default, $border-right-default;
-  }
-
   .#{$ns}-table-header {
     box-shadow: $border-bottom-default;
   }
 
+  // Keep dividers inside cells at the edges of clipped quadrants.
+  .#{$ns}-table-menu,
+  .#{$ns}-table-row-selection-header-cell,
   .#{$ns}-table-cell {
     box-shadow: $inset-border-bottom-default, $inset-border-right-default;
   }
@@ -42,23 +37,14 @@ for all borders with minimal duplication. See the bottom of this file.
     height: $border-width;
   }
 
-  .#{$ns}-table-column-headers .#{$ns}-table-header {
-    box-shadow: $border-bottom-default, $inset-border-right-default;
-
-    &::before {
-      bottom: 0;
-      // hover shadow
-      right: $border-width;
-    }
-  }
-
+  .#{$ns}-table-column-headers .#{$ns}-table-header,
   .#{$ns}-table-row-headers .#{$ns}-table-header {
-    box-shadow: $inset-border-bottom-default, $border-right-default;
+    box-shadow: $inset-border-bottom-default, $inset-border-right-default;
 
     &::before {
       bottom: $border-width;
       // hover shadow
-      right: 0;
+      right: $border-width;
     }
   }
 
@@ -93,22 +79,22 @@ for all borders with minimal duplication. See the bottom of this file.
 
     .#{$ns}-table-header {
       &.#{$ns}-table-last-in-row {
-        box-shadow: $border-bottom-default, $inset-border-right-frozen;
+        box-shadow: $inset-border-bottom-default, $inset-border-right-frozen;
 
         &::before {
-          bottom: 0;
+          bottom: $border-width;
           // hover shadow
           right: $frozen-border-width;
         }
       }
 
       &.#{$ns}-table-last-in-column {
-        box-shadow: $inset-border-bottom-frozen, $border-right-default;
+        box-shadow: $inset-border-bottom-frozen, $inset-border-right-default;
 
         &::before {
           bottom: $frozen-border-width;
           // hover shadow
-          right: 0;
+          right: $border-width;
         }
       }
     }
