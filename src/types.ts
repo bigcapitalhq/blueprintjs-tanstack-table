@@ -8,6 +8,7 @@ import {
 import {
   ColumnPinningState,
   ColumnVisibilityState,
+  type ExpandedState,
   type Row,
   RowData,
   RowPinningState,
@@ -103,6 +104,8 @@ export type BP_ColumnPinningState = ColumnPinningState;
 export type BP_RowPinningState = RowPinningState;
 /** Maps row ids to their selection (`true` = selected), driven by the row-selection checkboxes. */
 export type BP_RowSelectionState = RowSelectionState;
+/** Expanded row IDs, or `true` to expand every eligible row. */
+export type BP_ExpandedRowsState = ExpandedState;
 export type BP_RowDetailRenderer<TData extends BP_RowData> = (row: Row<BP_TableFeatures, TData>) => ReactNode;
 
 type RowExpanderPropsValue<TData extends BP_RowData, TProps> =

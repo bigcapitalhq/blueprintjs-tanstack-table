@@ -12,6 +12,7 @@ import type { BP_MenuContext } from './common/menu-context.ts';
 import {
   TableLoadingOption,
   type BP_RowSelectionState,
+  type BP_ExpandedRowsState,
   type BP_TableFeatures,
   type BP_VisibilityState,
 } from '../types.ts';
@@ -95,6 +96,7 @@ export const RowDetails: Story = {
     columns,
     getRowId: (person) => String(person.id),
     renderRowDetail: (row) => <p>{biographies[row.original.id]}</p>,
+    initialExpandedRows: { '1': true },
     rowDetailHeight: 72,
     rowExpanderIconProps: { size: 16 },
     rowExpanderButtonProps: (row) => ({
@@ -102,6 +104,23 @@ export const RowDetails: Story = {
     }),
   },
   decorators: Basic.decorators,
+};
+
+export const ControlledRowDetails: Story = {
+  args: RowDetails.args,
+  decorators: Basic.decorators,
+  render: function ControlledRowDetailsTable(args) {
+    const [expandedRows, setExpandedRows] = useState<BP_ExpandedRowsState>({});
+    return (
+      <>
+        <div className="bp-table-demo-toolbar">
+          <Button onClick={() => setExpandedRows(true)}>Expand all</Button>
+          <Button onClick={() => setExpandedRows({})}>Collapse all</Button>
+        </div>
+        <BP_Table {...args} expandedRows={expandedRows} onExpandedRowsChange={setExpandedRows} />
+      </>
+    );
+  },
 };
 
 export const ExpandingSubRows: Story = {

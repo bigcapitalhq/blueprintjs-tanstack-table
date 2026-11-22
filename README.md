@@ -218,6 +218,7 @@ uses a person record with an optional `bio` field.
   getRowId={(person) => String(person.id)}
   getRowCanExpand={(row) => Boolean(row.original.bio)}
   renderRowDetail={(row) => <p>{row.original.bio}</p>}
+  initialExpandedRows={{ '1': true }}
   rowDetailHeight={80}
   rowExpanderIconProps={{ size: 16 }}
   rowExpanderButtonProps={(row) => ({
@@ -235,9 +236,31 @@ cancel the toggle.
 
 For a tree with the same columns at every level, supply
 `getSubRows={(record) => record.children}`. Parents get a disclosure button,
-and expanded children appear in the row model. Both forms support
-`initialState.expanded` for initial expansion and `state.expanded` with
-`onExpandedChange` for controlled expansion. Use stable row IDs for either form.
+and expanded children appear in the row model. Use stable row IDs for both
+trees and detail panels.
+
+Expansion is uncontrolled by default. Pass `initialExpandedRows` to choose
+which rows start open. Pass `expandedRows` to control expansion from a parent.
+
+```tsx
+const [expandedRows, setExpandedRows] = useState<BP_ExpandedRowsState>({});
+
+<BP_Table
+  data={data}
+  columns={columns}
+  getRowId={(person) => String(person.id)}
+  renderRowDetail={(row) => <p>{row.original.bio}</p>}
+  expandedRows={expandedRows}
+  onExpandedRowsChange={setExpandedRows}
+/>;
+```
+
+`onExpandedRowsChange` receives the next expansion value in either mode.
+Use a row-ID map to expand specific rows, `{}` to collapse all rows, or
+`true` to expand every eligible row. The standard TanStack `state.expanded`,
+`initialState.expanded`, and `onExpandedChange` options are also supported.
+The dedicated value and initial-value props take precedence over their
+corresponding state options.
 
 Right-click context menus are customized with a renderer that receives the
 Blueprint-style `BP_MenuContext` (the equivalent of Blueprint's `MenuContext`)
@@ -431,6 +454,7 @@ Things worth knowing:
 | --- | --- |
 | `Basic` | Minimal table with column reordering. |
 | `RowDetails` | Expand a person to read their biography. |
+| `ControlledRowDetails` | Control row details with the carets and expand-all or collapse-all buttons. |
 | `ExpandingSubRows` | Expand a parent to see its child rows. |
 | `ColumnGroups` | Nested column definitions on a second header row. |
 | `Loading` | Skeleton placeholders in cells, column headers, and row headers. |
