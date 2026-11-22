@@ -5,7 +5,9 @@ import {
   columnResizingFeature,
   columnSizingFeature,
   columnVisibilityFeature,
+  createExpandedRowModel,
   createSortedRowModel,
+  rowExpandingFeature,
   rowPinningFeature,
   rowSelectionFeature,
   rowSortingFeature,
@@ -23,7 +25,7 @@ import {
 /**
  * The feature registry `BP_Table` uses by default: column sizing/resizing,
  * ordering, visibility, pinning, row pinning, row selection, cell selection,
- * and sorting. It is exported so layers built on top of `BP_Table` (such as
+ * expanding, and sorting. It is exported so layers built on top of `BP_Table` (such as
  * the `withPagination` HOC) can compose additional features without having to
  * replace the defaults.
  *
@@ -37,10 +39,12 @@ export const DEFAULT_BP_TABLE_FEATURES = tableFeatures({
   columnOrderingFeature,
   columnVisibilityFeature,
   columnPinningFeature,
+  rowExpandingFeature,
   rowPinningFeature,
   rowSelectionFeature,
   cellSelectionFeature,
   rowSortingFeature,
+  expandedRowModel: createExpandedRowModel(),
   sortedRowModel: createSortedRowModel(),
   sortFns,
 });

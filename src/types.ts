@@ -1,10 +1,15 @@
+import type { IconProps } from '@blueprintjs/core';
 import {
+  type ButtonHTMLAttributes,
   type HTMLProps,
+  type ReactNode,
   type MutableRefObject,
 } from 'react';
 import {
   ColumnPinningState,
   ColumnVisibilityState,
+  type ExpandedState,
+  type Row,
   RowData,
   RowPinningState,
   RowSelectionState,
@@ -99,5 +104,23 @@ export type BP_ColumnPinningState = ColumnPinningState;
 export type BP_RowPinningState = RowPinningState;
 /** Maps row ids to their selection (`true` = selected), driven by the row-selection checkboxes. */
 export type BP_RowSelectionState = RowSelectionState;
+/** Expanded row IDs, or `true` to expand every eligible row. */
+export type BP_ExpandedRowsState = ExpandedState;
+export type BP_RowDetailRenderer<TData extends BP_RowData> = (row: Row<BP_TableFeatures, TData>) => ReactNode;
+
+type RowExpanderPropsValue<TData extends BP_RowData, TProps> =
+  | TProps
+  | ((row: Row<BP_TableFeatures, TData>) => TProps);
+
+export type BP_RowExpanderOptions<TData extends BP_RowData> = {
+  /** Native props for the row's disclosure button, or a function of the row. */
+  rowExpanderButtonProps?: RowExpanderPropsValue<
+    TData,
+    Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'dangerouslySetInnerHTML'>
+  >;
+  /** Blueprint Icon props, or a function of the row for state-dependent icons. */
+  rowExpanderIconProps?: RowExpanderPropsValue<TData, Partial<IconProps>>;
+};
+
 export type BP_TableInstance<TData extends BP_RowData = BP_RowData> =
   ReactTable<BP_TableFeatures, TData>;

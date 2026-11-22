@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import { useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import {
   TABLE_CONTAINER,
   TABLE_NO_HORIZONTAL_SCROLL,
@@ -21,6 +21,8 @@ import { TableQuadrantStack } from '../quadrant/TableQuadrantStack.tsx';
 import type { BP_BodyContextMenuRenderer } from '../common/menu-context.ts';
 import type {
   BP_RowData,
+  BP_RowExpanderOptions,
+  BP_RowDetailRenderer,
   BP_TableInstance,
   HTMLPropsRef,
   TableLoading,
@@ -30,11 +32,14 @@ import type { TableLayout } from '../common/dimensions.ts';
 export type TableContainerProps<TData extends BP_RowData> = HTMLPropsRef<HTMLDivElement> &
   TableLayout &
   TableLoading &
+  BP_RowExpanderOptions<TData> &
   Pick<
     RowVirtualizerOptions<TData>,
     'enableRowVirtualization' | 'overscanRowCount'
   > & {
     table: BP_TableInstance<TData>;
+    renderRowDetail?: BP_RowDetailRenderer<TData>;
+    rowDetailHeight: number;
     /** Whether to render the row headers (the row-number column) and corner menu. */
     enableRowHeader?: boolean;
     enableColumnReordering?: boolean;
@@ -60,6 +65,10 @@ export type TableContainerProps<TData extends BP_RowData> = HTMLPropsRef<HTMLDiv
 
 export function TableContainer<TData extends BP_RowData>({
   table,
+  renderRowDetail,
+  rowExpanderButtonProps,
+  rowExpanderIconProps,
+  rowDetailHeight,
   rowHeight,
   rowHeaderWidth,
   enableRowHeader = true,
@@ -108,9 +117,21 @@ export function TableContainer<TData extends BP_RowData>({
     headerRowCount: table.getHeaderGroups().length,
   });
 
+  const getDetailHeight = useMemo(() => {
+    if (!renderRowDetail || (!table.options.getIsRowExpanded && !table.getIsSomeRowsExpanded?.())) {
+      return undefined;
+    }
+    const rows = table.getRowModel().rows;
+    return (index: number) => {
+      const row = rows[index];
+      return row.getIsExpanded?.() && row.getCanExpand() ? Math.max(0, rowDetailHeight) : 0;
+    };
+  }, [renderRowDetail, rowDetailHeight, table]);
+
   const rowResizing: RowResizingApi = useRowResizing({
     rowHeight,
     rowCount: table.getRowModel().rows.length,
+    getDetailHeight,
     rowHeights,
     defaultRowHeights,
     enableRowResizing,
@@ -159,6 +180,9 @@ export function TableContainer<TData extends BP_RowData>({
     >
       <TableQuadrantStack
         table={table}
+        renderRowDetail={renderRowDetail}
+        rowExpanderButtonProps={rowExpanderButtonProps}
+        rowExpanderIconProps={rowExpanderIconProps}
         rowHeaderWidth={rowHeaderWidth}
         enableRowHeader={enableRowHeader}
         columnHeaderHeight={resolvedColumnHeaderHeight}

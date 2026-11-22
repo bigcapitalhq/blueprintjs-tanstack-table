@@ -61,7 +61,7 @@ export function getCellFromClientPoint<TData extends BP_RowData>(
   const viewportY = clientY - rect.top;
 
   const frozenColumnsWidth = getFrozenColumnsWidth(table);
-  const frozenRowsHeight = getFrozenRowsHeight(table, getRowHeight);
+  const frozenRowsHeight = getFrozenRowsHeight(table, getRowTop);
 
   // The frozen columns/rows are pinned to the leading edge of the viewport and
   // never scroll; the scrollable region starts after them and is shifted by

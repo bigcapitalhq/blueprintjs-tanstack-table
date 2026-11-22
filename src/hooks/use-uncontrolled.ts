@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState, type SetStateAction } from 'react';
 
 export type UseUncontrolledInput<T> = {
   /** Value for controlled state. */
@@ -23,19 +23,24 @@ export function useUncontrolled<T>({
   value,
   initialValue,
   finalValue,
-  onChange = () => {},
-}: UseUncontrolledInput<T>): [T, (value: T) => void, boolean] {
+  onChange,
+}: UseUncontrolledInput<T>): [T, (update: SetStateAction<T>) => void, boolean] {
   const [uncontrolledValue, setUncontrolledValue] = useState<T>(
     initialValue !== undefined ? initialValue : (finalValue as T),
   );
 
-  const handleUncontrolledChange = (next: T) => {
-    setUncontrolledValue(next);
+  // Keep consecutive functional updates in the same event in order, before
+  // React commits the next render. Controlled updates use the caller's value.
+  const pendingValue = useRef(uncontrolledValue);
+  const setValue = (update: SetStateAction<T>) => {
+    const previous = value !== undefined ? value : pendingValue.current;
+    const next = typeof update === 'function' ? (update as (old: T) => T)(previous) : update;
+    if (value === undefined) {
+      pendingValue.current = next;
+      setUncontrolledValue(() => next);
+    }
     onChange?.(next);
   };
 
-  if (value !== undefined) {
-    return [value, onChange, true];
-  }
-  return [uncontrolledValue, handleUncontrolledChange, false];
+  return [value !== undefined ? value : uncontrolledValue, setValue, value !== undefined];
 }

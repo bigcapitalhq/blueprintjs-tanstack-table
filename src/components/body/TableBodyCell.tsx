@@ -1,9 +1,11 @@
 import classNames from 'classnames';
 import { Classes } from '@blueprintjs/core';
 import { type Cell } from '@tanstack/react-table';
+import { TableRowExpander } from './TableRowExpander.tsx';
 import { LoadableContent } from '../common/LoadableContent.tsx';
 import {
   TABLE_CELL,
+  TABLE_CELL_WITH_EXPANDER,
   TABLE_CELL_LEDGER_EVEN,
   TABLE_CELL_LEDGER_ODD,
   TABLE_LAST_IN_COLUMN,
@@ -18,11 +20,12 @@ import {
 import type { ColumnRegion } from '../common/pinning.ts';
 import type {
   BP_RowData,
+  BP_RowExpanderOptions,
   BP_TableFeatures,
   BP_TableInstance,
 } from '../../types.ts';
 
-export type TableBodyCellProps<TData extends BP_RowData> = {
+export type TableBodyCellProps<TData extends BP_RowData> = BP_RowExpanderOptions<TData> & {
   table: BP_TableInstance<TData>;
   cell: Cell<BP_TableFeatures, TData, unknown>;
   /** Absolute index of the row this cell belongs to. */
@@ -33,6 +36,7 @@ export type TableBodyCellProps<TData extends BP_RowData> = {
   columnRegion: ColumnRegion;
   rowHeight: number;
   loading: boolean;
+  isExpansionCell: boolean;
   isLastInRow: boolean;
   isLastInColumn: boolean;
 };
@@ -45,12 +49,30 @@ export function TableBodyCell<TData extends BP_RowData>({
   columnRegion,
   rowHeight,
   loading,
+  isExpansionCell,
+  rowExpanderButtonProps,
+  rowExpanderIconProps,
   isLastInRow,
   isLastInColumn,
 }: TableBodyCellProps<TData>) {
   const size = cell.column.getSize();
   const start = cell.column.getStart(columnRegion);
+  const canExpand = isExpansionCell && cell.row.getCanExpand?.();
   const bodyCellClassName = cell.column.columnDef.meta?.bodyCellClassName;
+  const showExpander = canExpand && !loading;
+  const indentation = isExpansionCell && cell.row.depth > 0
+    ? { paddingInlineStart: cell.row.depth * 16 }
+    : undefined;
+  const content = (
+    <div
+      className={classNames(TABLE_TRUNCATED_TEXT, TABLE_NO_WRAP_TEXT)}
+      style={showExpander ? undefined : indentation}
+    >
+      <LoadableContent loading={loading} variableLength>
+        <table.FlexRender cell={cell} />
+      </LoadableContent>
+    </div>
+  );
 
   return (
     <div
@@ -85,11 +107,17 @@ export function TableBodyCell<TData extends BP_RowData>({
       }}
       onMouseEnter={cell.getSelectionExtendHandler()}
     >
-      <div className={classNames(TABLE_TRUNCATED_TEXT, TABLE_NO_WRAP_TEXT)}>
-        <LoadableContent loading={loading} variableLength>
-          <table.FlexRender cell={cell} />
-        </LoadableContent>
-      </div>
+      {showExpander ? (
+        <div className={TABLE_CELL_WITH_EXPANDER} style={indentation}>
+          <TableRowExpander
+            row={cell.row}
+            rowIndex={rowIndex}
+            rowExpanderButtonProps={rowExpanderButtonProps}
+            rowExpanderIconProps={rowExpanderIconProps}
+          />
+          {content}
+        </div>
+      ) : content}
     </div>
   );
 }

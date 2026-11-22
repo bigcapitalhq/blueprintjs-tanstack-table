@@ -22,6 +22,7 @@ export type TableRowSelectionCellProps<TData extends BP_RowData> = {
   row?: Row<BP_TableFeatures, TData>;
   rowIndex: number;
   rowHeight: number;
+  detailHeight: number;
   loading: boolean;
   isLastInColumn: boolean;
 };
@@ -34,6 +35,7 @@ export function TableRowSelectionCell<TData extends BP_RowData>({
   row,
   rowIndex,
   rowHeight,
+  detailHeight,
   loading,
   isLastInColumn,
 }: TableRowSelectionCellProps<TData>) {
@@ -45,7 +47,7 @@ export function TableRowSelectionCell<TData extends BP_RowData>({
         [Classes.LOADING]: loading,
         [TABLE_ROW_SELECTED]: isSelected,
       })}
-      style={{ height: rowHeight }}
+      style={{ marginBottom: detailHeight, height: rowHeight }}
     >
       {!loading && row != null && (
         <div className={TABLE_ROW_SELECTION_CHECKBOX}>

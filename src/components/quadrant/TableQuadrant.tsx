@@ -28,6 +28,8 @@ import type { BP_RowVirtualizer } from '../../hooks/use-row-virtualizer.ts';
 import type { RowResizingApi } from '../../hooks/use-row-resizing.ts';
 import type {
   BP_RowData,
+  BP_RowExpanderOptions,
+  BP_RowDetailRenderer,
   BP_TableInstance,
 } from '../../types.ts';
 import { TableBody } from '../body/TableBody.tsx';
@@ -37,9 +39,10 @@ import { TableMenu } from '../head/TableMenu.tsx';
 import { TableRowSelectionHeaderCell } from '../head/TableRowSelectionHeaderCell.tsx';
 import { QuadrantType } from './quadrant-type.ts';
 
-export type TableQuadrantProps<TData extends BP_RowData> = {
+export type TableQuadrantProps<TData extends BP_RowData> = BP_RowExpanderOptions<TData> & {
   quadrantType: QuadrantType;
   table: BP_TableInstance<TData>;
+  renderRowDetail?: BP_RowDetailRenderer<TData>;
   rowHeaderWidth: number;
   /** Whether to render the row headers (the row-number column) and corner menu. */
   enableRowHeader?: boolean;
@@ -97,6 +100,9 @@ function quadrantCssClass(quadrantType: QuadrantType) {
 export function TableQuadrant<TData extends BP_RowData>({
   quadrantType,
   table,
+  renderRowDetail,
+  rowExpanderButtonProps,
+  rowExpanderIconProps,
   rowHeaderWidth,
   enableRowHeader = true,
   columnHeaderHeight,
@@ -127,7 +133,7 @@ export function TableQuadrant<TData extends BP_RowData>({
 
   const selection = useTableSelection();
   const frozenColumnsWidth = getFrozenColumnsWidth(table);
-  const frozenRowsHeight = getFrozenRowsHeight(table, rowResizing.getRowHeight);
+  const frozenRowsHeight = getFrozenRowsHeight(table, rowResizing.getRowTop);
   // The row-number column collapses when the row headers are disabled; the
   // selection column (when enabled) still occupies the frozen chrome.
   const rowNumberColumnWidth = enableRowHeader ? rowHeaderWidth : 0;
@@ -135,6 +141,9 @@ export function TableQuadrant<TData extends BP_RowData>({
   const renderBody = (offsetTop: number, offsetLeft: number) => (
     <TableBody
       table={table}
+      renderRowDetail={renderRowDetail}
+      rowExpanderButtonProps={rowExpanderButtonProps}
+      rowExpanderIconProps={rowExpanderIconProps}
       columnRegion={columnRegion}
       rowRegion={rowRegion}
       offsetTop={offsetTop}
