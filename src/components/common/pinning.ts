@@ -76,21 +76,9 @@ export function getColumnDisplayOffset<TData extends BP_RowData>(
 /** Pixel height of the frozen ("top") rows. */
 export function getFrozenRowsHeight<TData extends BP_RowData>(
   table: BP_TableInstance<TData>,
-  getRowHeight: (index: number) => number,
+  getRowTop: (index: number) => number,
 ): number {
-  return sumRowHeights(0, getFrozenRowCount(table), getRowHeight);
-}
-
-function sumRowHeights(
-  startIndex: number,
-  endIndex: number,
-  getRowHeight: (index: number) => number,
-): number {
-  let height = 0;
-  for (let index = startIndex; index < endIndex; index++) {
-    height += getRowHeight(index);
-  }
-  return height;
+  return getRowTop(getFrozenRowCount(table));
 }
 
 /**

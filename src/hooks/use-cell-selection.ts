@@ -276,7 +276,7 @@ export function useCellSelection<TData extends BP_RowData>({
     const frozenColumnCount = getFrozenColumnCount(table);
     const frozenColumnsWidth = getFrozenColumnsWidth(table);
     const frozenRowCount = getFrozenRowCount(table);
-    const frozenRowsHeight = getFrozenRowsHeight(table, getRowHeight);
+    const frozenRowsHeight = getFrozenRowsHeight(table, getRowTop);
 
     // The cell's position in the content coordinate space (frozen columns
     // and rows first, scrollable region after them; `column.getStart()` and

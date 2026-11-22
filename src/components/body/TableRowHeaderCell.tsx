@@ -30,6 +30,7 @@ export type TableRowHeaderCellProps<TData extends BP_RowData> = HTMLPropsRef<HTM
   row?: Row<BP_TableFeatures, TData>;
   rowIndex: number;
   rowHeight: number;
+  detailHeight: number;
   loading: boolean;
   isLastInColumn: boolean;
   /** Whether this row is currently being resized. */
@@ -42,6 +43,7 @@ export function TableRowHeaderCell<TData extends BP_RowData>({
   row,
   rowIndex,
   rowHeight,
+  detailHeight,
   loading,
   isLastInColumn,
   isResizing = false,
@@ -58,7 +60,7 @@ export function TableRowHeaderCell<TData extends BP_RowData>({
         [Classes.LOADING]: loading,
         [TABLE_ROW_SELECTED]: row?.getIsSelected() ?? false,
       }, className)}
-      style={{ flexBasis: rowHeight, height: rowHeight, minHeight: 0 }}
+      style={{ marginBottom: detailHeight, flexBasis: rowHeight, height: rowHeight, minHeight: 0 }}
       onMouseDown={(event) => selection?.handleRowHeaderMouseDown(rowIndex, event)}
     >
       <div className={TABLE_ROW_NAME}>
