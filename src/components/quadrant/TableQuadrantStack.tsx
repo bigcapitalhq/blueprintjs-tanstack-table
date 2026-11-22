@@ -14,7 +14,7 @@ import {
   useRowVirtualizer,
   type BP_RowVirtualizer,
 } from '../../hooks/use-row-virtualizer.ts';
-import type { CellFocusSelectionApi } from '../../hooks/use-cell-focus-selection.ts';
+import type { CellSelectionApi } from '../../hooks/use-cell-selection.ts';
 import type { RowResizingApi } from '../../hooks/use-row-resizing.ts';
 import type { BP_GhostCells } from '../../hooks/use-ghost-cells.ts';
 import type {
@@ -40,7 +40,7 @@ export type TableQuadrantStackProps<TData extends BP_RowData> = {
   areCellsLoading: boolean;
   areColumnHeadersLoading: boolean;
   areRowHeadersLoading: boolean;
-  selection: CellFocusSelectionApi;
+  selection: CellSelectionApi;
   rowResizing: RowResizingApi;
   ghosts?: BP_GhostCells;
   enableRowVirtualization?: boolean;

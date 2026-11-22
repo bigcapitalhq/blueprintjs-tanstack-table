@@ -161,9 +161,10 @@ export const FocusSelection: Story = {
       <div className="bp-table-demo-wrapper">
         <Story />
         <p className="bp-table-demo-hint">
-          Click a cell to focus/select. Drag to select a range. Click row/column headers or the
-          corner menu to select rows/columns/all. Arrow keys move focus; Shift+arrows resize
-          selection; Cmd/Ctrl+A selects all.
+          Click a cell to focus/select. Drag to select a range, Shift-click to extend, and
+          Ctrl/Cmd-click or drag to add/subtract ranges. Click row/column headers or the corner
+          menu to select rows/columns/all. Arrow keys move focus; Shift+arrows extend the
+          selection; Tab moves focus; Cmd/Ctrl+A selects all; Escape clears.
         </p>
       </div>
     ),

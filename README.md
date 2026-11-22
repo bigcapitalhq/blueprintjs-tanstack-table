@@ -20,8 +20,8 @@ A Blueprint.js-styled data table for React, built on [TanStack Table v9](https:/
 - **Column reordering** — drag column headers to reorder columns (`enableColumnReordering`).
 - **Column resizing** — drag the resize handle on header cells (TanStack's `column.getResizeHandler()`).
 - **Sorting** — hover a column header and use the chevron menu for *Sort Asc* / *Sort Desc* / *Clear Sort* (`enableSorting`); controlled or uncontrolled via `state.sorting` / `onSortingChange`.
-- **Focused cell & keyboard navigation** — click a cell to focus it; arrow keys move focus, Shift+arrows extend the selection, and Cmd/Ctrl+A selects everything (`enableFocusedCell`).
-- **Region selection** — select cells by dragging, or full rows / columns / the whole table from the headers and corner menu; controlled or uncontrolled (`selectedRegions` / `onSelection`, `selectionModes`).
+- **Focused cell & keyboard navigation** — click a cell to focus it; arrow keys move focus, Shift+arrows extend the selection, Tab moves focus, Cmd/Ctrl+A selects everything, and Escape clears the selection (`enableFocusedCell`).
+- **Region selection** — select cells by dragging, or full rows / columns / the whole table from the headers and corner menu; controlled or uncontrolled (`selectedRegions` / `onSelection`, `selectionModes`). Cell ranges are backed by TanStack Table's `cellSelectionFeature`, so drags, Shift-click extend, and Ctrl/Cmd-click multi-range include/exclude come from the plugin, and the selection survives sorting and reordering (it is keyed by row and column ids).
 - **Row selection (checkboxes)** — opt-in checkboxes in a column right after the row numbers, with a select-all checkbox in the column's header (`showRowSelectionCheckboxes`, `rowSelectionColumnWidth`). Controlled or uncontrolled (`rowSelection` / `defaultRowSelection` + `onRowSelectionChange`, `getRowId`); shift-click selects a range, and checked rows are highlighted. This is independent of the region selection above.
 - **Body context menu** — right-click a cell to open a custom Blueprint `Menu` (`bodyContextMenuRenderer`). A right-click outside the current selection selects the clicked cell first, and the renderer receives the selection (or the clicked cell) as a `BP_MenuContext` that also exposes the TanStack row and cell under the cursor.
 - **Row resizing** — drag the horizontal handle at the bottom of a row header (`enableRowResizing`); controlled or uncontrolled, with configurable min/max heights.
@@ -290,10 +290,11 @@ Notes:
 - Pagination composes with sorting, row virtualization, frozen rows/columns,
   and row resizing. Sorting (or a `data` change) resets to the first page by
   default, per TanStack's `autoResetPageIndex`.
-- Row numbers, ledger striping, row resizing, and selection/focus regions are
-  **page-local**: each page numbers its rows starting at 1. When `selectedRegions`
-  or `focusedCell` are controlled, reset them from `onPaginationChange` if they
-  should not carry across pages.
+- Row numbers, ledger striping, and row resizing are **page-local**: each page
+  numbers its rows starting at 1. Cell selections are keyed by row ids, so a
+  range can light up on every page it overlaps (TanStack's `cellSelectionFeature`
+  semantics); the `onSelection` callback reports regions resolved against the
+  currently rendered page's rows.
 
 ### Pagination bar
 
@@ -324,13 +325,13 @@ navigation are owned by the caller.
 | `columnHeaderHeight` | `number` | `30` | Height of the frozen column-header row(s), in pixels. |
 | `enableColumnReordering` | `boolean` | `false` | Drag column headers to reorder columns. |
 | `enableSorting` | `boolean` | `false` | Chevron sort menu on sortable headers; also enables TanStack sorting. |
-| `enableFocusedCell` | `boolean` | `false` | Focused cell with keyboard navigation and selection. |
+| `enableFocusedCell` | `boolean` | `false` | Focused cell with keyboard navigation and selection (arrow keys, Shift+arrows, Tab, Cmd/Ctrl+A, Escape). |
 | `enableGhostCells` | `boolean` | `false` | Fill leftover viewport space with empty cells (body, column headers, row headers) when the content doesn't overflow; scrolling is disabled on filled axes. |
 | `bodyContextMenuRenderer` | `(context: BP_MenuContext<TData>) => ReactElement \| null \| undefined` | — | Render a custom context menu when right-clicking a body cell. |
 | `enableBodyContextMenu` | `boolean` | `true` when a renderer is set | Whether the body context menu is enabled. |
-| `focusedCell` / `onFocusedCell` | `FocusedCellCoordinates` / callback | — | Controlled focused cell. |
+| `onFocusedCell` | `(cell: FocusedCellCoordinates) => void` | — | Fires when the focused cell changes. The focused cell is the active cell of TanStack's cell selection feature; it is not controllable directly. |
 | `onFocusedRegion` | `(region) => void` | — | Fires when the focused region changes. |
-| `selectedRegions` / `onSelection` | `Region[]` / callback | — | Controlled region selection. |
+| `selectedRegions` / `onSelection` | `Region[]` / callback | — | Controlled region selection (`selectedRegions`), backed by TanStack's `cellSelection` state; `onSelection` fires in both modes. Full-row/column/table regions are emulated as ranges spanning all visible rows/columns. |
 | `selectionModes` | `RegionCardinality[]` | all | Restricts which selection types are allowed (cells, rows, columns, table). |
 | `showRowSelectionCheckboxes` | `boolean` | `false` | Checkbox column right after the row numbers, with a select-all checkbox in its header; independent of the region selection. |
 | `rowSelectionColumnWidth` | `number` | `30` | Width of the row-selection checkbox column (only used with `showRowSelectionCheckboxes`). |
@@ -349,6 +350,44 @@ navigation are owned by the caller.
 | `loadingOptions` | `TableLoadingOption[]` | `[]` | Renders skeleton placeholders: `CELLS`, `COLUMN_HEADERS`, `ROW_HEADERS`. |
 | `htmlProps` | `HTMLPropsRef<HTMLDivElement>` | — | Standard HTML attributes spread onto the table's outer container `<div>`; `className` is merged with the container classes, and `ref` points at the container (not the scroll viewport). |
 
+## Cell selection
+
+Cell-range selection is backed by TanStack Table's built-in
+`cellSelectionFeature` plugin: the plugin owns the selection state and the
+mouse interactions (drag selection, Shift-click extend, Ctrl/Cmd-click
+multi-range include/exclude), and `BP_Table` layers the Blueprint experience on
+top — the `selectedRegions` / `onSelection` / `selectionModes` props, full
+row/column/table selection from the headers and corner menu, keyboard
+navigation, and the `BP_MenuContext` API.
+
+Things worth knowing:
+
+- **Ranges are keyed by row and column ids**, so a selection follows its rows
+  when the table is sorted or columns are reordered. Pair the table with
+  `getRowId` for stable ids from your data. A range whose corners are
+  filtered out or hidden stays in state (inert) and comes back when its rows
+  or columns return.
+- **Full-row/column/table selections are emulated** as ranges spanning all
+  currently visible rows and/or columns. The cardinality is inferred back on
+  read, so `onSelection` and `BP_MenuContext` still report `FULL_ROWS`,
+  `FULL_COLUMNS`, and `FULL_TABLE` regions.
+- **`selectedRegions` control** is translated to the plugin's
+  `cellSelection` state; regions outside the current row/column counts are
+  ignored. TanStack's native `state.cellSelection` / `onCellSelectionChange`
+  also pass straight through for consumers that prefer the plugin's API.
+- **Selection resets when `data` changes**, per the plugin's
+  `autoResetCellSelection` (default `true`); pass `autoResetCellSelection: false`
+  to keep ranges across data changes.
+- The **focused cell** is the plugin's active cell (the anchor of the most
+  recent range), reported through `onFocusedCell` / `onFocusedRegion`. Unlike
+  the old custom implementation, it is not separately controllable.
+- **Keyboard navigation** (arrow keys, Shift+arrows, Tab, Cmd/Ctrl+A, Escape)
+  drives the plugin's `moveCellSelection` / `extendCellSelection` /
+  `selectAllCells` / `resetCellSelection` APIs. `Tab` collapses the selection
+  onto the neighboring cell.
+- **Drags start on rendered cells only**: ghost cells and rows scrolled out of
+  a virtualized window do not start or extend a drag.
+
 ## Storybook stories
 
 | Story | What it demos |
@@ -357,7 +396,7 @@ navigation are owned by the caller.
 | `ColumnGroups` | Nested column definitions on a second header row. |
 | `Loading` | Skeleton placeholders in cells, column headers, and row headers. |
 | `GhostCells` | Empty ghost cells fill leftover space when the table is smaller than its viewport. |
-| `FocusSelection` | Click/drag selection, row/column/corner-header selection, arrow-key focus, Shift+arrows, Cmd/Ctrl+A. |
+| `FocusSelection` | Click/drag selection, Ctrl/Cmd multi-range, row/column/corner-header selection, arrow-key focus, Shift+arrows, Cmd/Ctrl+A, Escape. |
 | `RowHeadersDisabled` | `enableRowHeader={false}` hides the row-number column and the corner menu; the checkbox column is independent and still renders. |
 | `RowSelection` | Uncontrolled checkbox row selection seeded by `defaultRowSelection`, with shift-click ranges, select-all, and a change listener. |
 | `ControlledRowSelection` | Caller-owned `rowSelection` driven by toolbar buttons and the checkboxes. |
