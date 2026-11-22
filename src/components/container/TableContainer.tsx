@@ -67,7 +67,6 @@ export type TableContainerProps<TData extends BP_RowData> = HTMLPropsRef<HTMLDiv
 export function TableContainer<TData extends BP_RowData>({
   table,
   renderRowDetail,
-  getRowProps,
   getCellProps,
   rowExpanderButtonProps,
   rowExpanderIconProps,
@@ -184,7 +183,6 @@ export function TableContainer<TData extends BP_RowData>({
       <TableQuadrantStack
         table={table}
         renderRowDetail={renderRowDetail}
-        getRowProps={getRowProps}
         getCellProps={getCellProps}
         rowExpanderButtonProps={rowExpanderButtonProps}
         rowExpanderIconProps={rowExpanderIconProps}

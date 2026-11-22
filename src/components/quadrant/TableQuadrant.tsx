@@ -102,7 +102,6 @@ export function TableQuadrant<TData extends BP_RowData>({
   quadrantType,
   table,
   renderRowDetail,
-  getRowProps,
   getCellProps,
   rowExpanderButtonProps,
   rowExpanderIconProps,
@@ -145,7 +144,6 @@ export function TableQuadrant<TData extends BP_RowData>({
     <TableBody
       table={table}
       renderRowDetail={renderRowDetail}
-      getRowProps={getRowProps}
       getCellProps={getCellProps}
       rowExpanderButtonProps={rowExpanderButtonProps}
       rowExpanderIconProps={rowExpanderIconProps}

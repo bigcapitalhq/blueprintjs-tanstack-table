@@ -110,14 +110,12 @@ export type BP_RowSelectionState = RowSelectionState;
 export type BP_ExpandedRowsState = ExpandedState;
 export type BP_RowDetailRenderer<TData extends BP_RowData> = (row: Row<BP_TableFeatures, TData>) => ReactNode;
 
-/** HTML attributes for a rendered data row or cell. The table owns its contents. */
+/** HTML attributes for a rendered data cell. The table owns its contents. */
 export type BP_BodyElementProps = Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'dangerouslySetInnerHTML'> & {
   [attribute: `data-${string}`]: string | number | boolean | undefined;
 };
 
 export type BP_BodyPropsOptions<TData extends BP_RowData> = {
-  /** Attributes for the row element in each quadrant that displays its data cells. */
-  getRowProps?: (row: Row<BP_TableFeatures, TData>) => BP_BodyElementProps | undefined;
   /** Attributes and event handlers for the entire data cell, including its padding. */
   getCellProps?: (cell: Cell<BP_TableFeatures, TData, unknown>) => BP_BodyElementProps | undefined;
 };

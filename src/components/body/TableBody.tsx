@@ -58,7 +58,6 @@ export type TableBodyProps<TData extends BP_RowData> = HTMLPropsRef<HTMLDivEleme
 export function TableBody<TData extends BP_RowData>({
   table,
   renderRowDetail,
-  getRowProps,
   getCellProps,
   rowExpanderButtonProps,
   rowExpanderIconProps,
@@ -126,43 +125,26 @@ export function TableBody<TData extends BP_RowData>({
               const rowTop = rowResizing.getRowTop(rowIndex) - regionTop;
               const rowHeight = rowResizing.getRowHeight(rowIndex);
               const detailHeight = rowResizing.getRowSpanHeight(rowIndex) - rowHeight;
-              const wrapRow = getRowProps !== undefined && cells.length > 0;
-              const rowProps = wrapRow ? getRowProps(row) : undefined;
-              const renderedCells = cells.map((cell, columnIndex) => (
-                <TableBodyCell
-                  key={cell.id}
-                  table={table}
-                  cell={cell}
-                  cellProps={getCellProps?.(cell)}
-                  rowExpanderButtonProps={rowExpanderButtonProps}
-                  rowExpanderIconProps={rowExpanderIconProps}
-                  isExpansionCell={columnRegion === firstColumnRegion && columnIndex === 0}
-                  rowIndex={rowIndex}
-                  rowTop={wrapRow ? 0 : rowTop}
-                  columnRegion={columnRegion}
-                  rowHeight={rowHeight}
-                  loading={areCellsLoading}
-                  isLastInRow={columnIndex === cells.length - 1}
-                  isLastInColumn={rowIndex === lastRowIndex}
-                />
-              ));
               return (
                 <Fragment key={row.id}>
-                  {wrapRow ? (
-                    <div
-                      {...rowProps}
-                      style={{
-                        ...rowProps?.style,
-                        position: 'absolute',
-                        left: 0,
-                        top: rowTop,
-                        height: rowHeight,
-                        width: regionWidth,
-                      }}
-                    >
-                      {renderedCells}
-                    </div>
-                  ) : renderedCells}
+                  {cells.map((cell, columnIndex) => (
+                    <TableBodyCell
+                      key={cell.id}
+                      table={table}
+                      cell={cell}
+                      cellProps={getCellProps?.(cell)}
+                      rowExpanderButtonProps={rowExpanderButtonProps}
+                      rowExpanderIconProps={rowExpanderIconProps}
+                      isExpansionCell={columnRegion === firstColumnRegion && columnIndex === 0}
+                      rowIndex={rowIndex}
+                      rowTop={rowTop}
+                      columnRegion={columnRegion}
+                      rowHeight={rowHeight}
+                      loading={areCellsLoading}
+                      isLastInRow={columnIndex === cells.length - 1}
+                      isLastInColumn={rowIndex === lastRowIndex}
+                    />
+                  ))}
                   {detailHeight > 0 && columnRegion === detailColumnRegion && (
                     <div
                       className={TABLE_ROW_DETAIL}

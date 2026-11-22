@@ -66,7 +66,6 @@ export type TableQuadrantStackProps<TData extends BP_RowData> = BP_BodyPropsOpti
 export function TableQuadrantStack<TData extends BP_RowData>({
   table,
   renderRowDetail,
-  getRowProps,
   getCellProps,
   rowExpanderButtonProps,
   rowExpanderIconProps,
@@ -262,7 +261,6 @@ export function TableQuadrantStack<TData extends BP_RowData>({
   const baseQuadrantProps = {
     table,
     renderRowDetail,
-    getRowProps,
     getCellProps,
     rowExpanderButtonProps,
     rowExpanderIconProps,

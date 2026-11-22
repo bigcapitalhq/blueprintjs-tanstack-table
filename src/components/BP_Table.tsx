@@ -272,7 +272,6 @@ export function BP_Table<TData extends BP_RowData>({
   initialExpandedRows,
   onExpandedRowsChange,
   renderRowDetail,
-  getRowProps,
   getCellProps,
   rowExpanderButtonProps,
   rowExpanderIconProps,
@@ -372,7 +371,6 @@ export function BP_Table<TData extends BP_RowData>({
       table={table}
       rowHeight={rowHeight}
       renderRowDetail={renderRowDetail}
-      getRowProps={getRowProps}
       getCellProps={getCellProps}
       rowExpanderButtonProps={rowExpanderButtonProps}
       rowExpanderIconProps={rowExpanderIconProps}

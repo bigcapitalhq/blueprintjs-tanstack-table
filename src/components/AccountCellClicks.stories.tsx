@@ -28,10 +28,6 @@ export const AccountCellClicks: StoryObj<typeof meta> = {
   args: {
     data: accounts,
     columns: accountColumns,
-    getRowProps: ({ original }) => ({
-      className: original.active ? undefined : 'account-inactive',
-      'data-testid': `account-row-${original.id}`,
-    }),
   },
   render: function AccountTable(args) {
     const [selected, setSelected] = useState<Account>();
@@ -40,7 +36,9 @@ export const AccountCellClicks: StoryObj<typeof meta> = {
         <div className="bp-table-demo-wrapper">
           <BP_Table
             {...args}
-            getCellProps={({ row }) => ({
+            getCellProps={({ row, column }) => ({
+              className: row.original.active ? undefined : 'account-inactive',
+              'data-testid': column.id === 'id' ? `account-row-${row.original.id}` : undefined,
               onClick: () => setSelected(row.original),
               style: { cursor: 'pointer' },
             })}

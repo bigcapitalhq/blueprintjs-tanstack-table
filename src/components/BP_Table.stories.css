@@ -64,6 +64,6 @@
   text-align: center;
 }
 
-.account-inactive .bp6-table-cell {
+.bp6-table-cell.account-inactive {
   opacity: 0.6;
 }

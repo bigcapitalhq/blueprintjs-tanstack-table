@@ -202,30 +202,26 @@ TanStack's `table.getSelectedRowModel()`. Selecting a subset of rows with a
 predicate is a regular table option: `enableRowSelection: (row) => …` disables
 the checkbox of non-selectable rows.
 
-### Cell clicks and row attributes
+### Cell clicks and attributes
 
-Use the TanStack row or cell to set HTML attributes on its outer element. This
-example styles inactive accounts, gives each account a test ID, and opens its
-details when any part of a data cell is clicked.
+Use `getCellProps` to set HTML attributes on the data cell. This example opens
+account details from any cell, styles every cell of an inactive account, and
+places the account’s test ID on its account-number cell.
 
 ```tsx
 <BP_Table
   data={accounts}
   columns={columns}
-  getRowProps={({ original }) => ({
-    className: original.active ? undefined : 'account-inactive',
-    'data-testid': `account-row-${original.id}`,
-  })}
-  getCellProps={({ row }) => ({
+  getCellProps={({ row, column }) => ({
+    className: row.original.active ? undefined : 'account-inactive',
+    'data-testid': column.id === 'id' ? `account-row-${row.original.id}` : undefined,
     onClick: () => openAccountDetails(row.original),
   })}
 />
 ```
 
-With frozen columns, each quadrant applies the row attributes to its own segment
-of the row. A test ID can therefore match both the frozen and scrollable segments.
-Cell classes are merged with the column’s `meta.bodyCellClassName`, and the table
-controls row and cell positions and dimensions.
+Cell classes are merged with the column’s `meta.bodyCellClassName`. The table
+controls each cell’s position and dimensions.
 
 ### Expandable rows
 
@@ -404,7 +400,6 @@ navigation are owned by the caller.
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
 | `data` / `columns` | TanStack `TableOptions` | — | Table data and column definitions (full TanStack option set is forwarded). |
-| `getRowProps` | `(row) => props` | — | HTML attributes for each rendered data row segment. |
 | `getCellProps` | `(cell) => props` | — | HTML attributes and event handlers for each rendered data cell. |
 | `rowHeight` | `number` | `20` | Height of each body row, in pixels. |
 | `rowHeaderWidth` | `number` | `30` | Width of the frozen row-header column, in pixels. |
