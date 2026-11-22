@@ -37,7 +37,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bigcapitalhq/blueprintjs-react-table.git"
+    "url": "git+https://github.com/bigcapitalhq/blueprintjs-tanstack-table.git"
   },
   "scripts": {
     "dev": "vite",
