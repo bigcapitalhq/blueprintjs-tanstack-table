@@ -202,6 +202,31 @@ TanStack's `table.getSelectedRowModel()`. Selecting a subset of rows with a
 predicate is a regular table option: `enableRowSelection: (row) => …` disables
 the checkbox of non-selectable rows.
 
+### Cell clicks and row attributes
+
+Use the TanStack row or cell to set HTML attributes on its outer element. This
+example styles inactive accounts, gives each account a test ID, and opens its
+details when any part of a data cell is clicked.
+
+```tsx
+<BP_Table
+  data={accounts}
+  columns={columns}
+  getRowProps={({ original }) => ({
+    className: original.active ? undefined : 'account-inactive',
+    'data-testid': `account-row-${original.id}`,
+  })}
+  getCellProps={({ row }) => ({
+    onClick: () => openAccountDetails(row.original),
+  })}
+/>
+```
+
+With frozen columns, each quadrant applies the row attributes to its own segment
+of the row. A test ID can therefore match both the frozen and scrollable segments.
+Cell classes are merged with the column’s `meta.bodyCellClassName`, and the table
+controls row and cell positions and dimensions.
+
 ### Expandable rows
 
 Pass `renderRowDetail` to show additional content beneath a row. The disclosure
@@ -379,6 +404,8 @@ navigation are owned by the caller.
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
 | `data` / `columns` | TanStack `TableOptions` | — | Table data and column definitions (full TanStack option set is forwarded). |
+| `getRowProps` | `(row) => props` | — | HTML attributes for each rendered data row segment. |
+| `getCellProps` | `(cell) => props` | — | HTML attributes and event handlers for each rendered data cell. |
 | `rowHeight` | `number` | `20` | Height of each body row, in pixels. |
 | `rowHeaderWidth` | `number` | `30` | Width of the frozen row-header column, in pixels. |
 | `enableRowHeader` | `boolean` | `true` | Render the row-number column; when `false`, the row headers and the corner menu are hidden (the checkbox column and frozen columns are unaffected). |
@@ -453,6 +480,7 @@ Things worth knowing:
 | Story | What it demos |
 | --- | --- |
 | `Basic` | Minimal table with column reordering. |
+| `AccountCellClicks` | Open account details from any data cell and style inactive rows. |
 | `RowDetails` | Expand a person to read their biography. |
 | `ControlledRowDetails` | Control row details with the carets and expand-all or collapse-all buttons. |
 | `ExpandingSubRows` | Expand a parent to see its child rows. |

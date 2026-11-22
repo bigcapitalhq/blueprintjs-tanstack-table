@@ -19,6 +19,7 @@ import type { RowResizingApi } from '../../hooks/use-row-resizing.ts';
 import type { BP_GhostCells } from '../../hooks/use-ghost-cells.ts';
 import type {
   BP_RowData,
+  BP_BodyPropsOptions,
   BP_RowExpanderOptions,
   BP_RowDetailRenderer,
   BP_TableInstance,
@@ -28,7 +29,7 @@ import { TableResizeGuides } from '../layers/TableResizeGuides.tsx';
 import { TableQuadrant } from './TableQuadrant.tsx';
 import { QuadrantType } from './quadrant-type.ts';
 
-export type TableQuadrantStackProps<TData extends BP_RowData> = BP_RowExpanderOptions<TData> & {
+export type TableQuadrantStackProps<TData extends BP_RowData> = BP_BodyPropsOptions<TData> & BP_RowExpanderOptions<TData> & {
   table: BP_TableInstance<TData>;
   renderRowDetail?: BP_RowDetailRenderer<TData>;
   rowHeaderWidth: number;
@@ -65,6 +66,8 @@ export type TableQuadrantStackProps<TData extends BP_RowData> = BP_RowExpanderOp
 export function TableQuadrantStack<TData extends BP_RowData>({
   table,
   renderRowDetail,
+  getRowProps,
+  getCellProps,
   rowExpanderButtonProps,
   rowExpanderIconProps,
   rowHeaderWidth,
@@ -259,6 +262,8 @@ export function TableQuadrantStack<TData extends BP_RowData>({
   const baseQuadrantProps = {
     table,
     renderRowDetail,
+    getRowProps,
+    getCellProps,
     rowExpanderButtonProps,
     rowExpanderIconProps,
     rowHeaderWidth,

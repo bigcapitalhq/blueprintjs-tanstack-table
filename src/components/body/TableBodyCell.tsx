@@ -19,6 +19,7 @@ import {
 } from '../common/classes.ts';
 import type { ColumnRegion } from '../common/pinning.ts';
 import type {
+  BP_BodyElementProps,
   BP_RowData,
   BP_RowExpanderOptions,
   BP_TableFeatures,
@@ -28,6 +29,7 @@ import type {
 export type TableBodyCellProps<TData extends BP_RowData> = BP_RowExpanderOptions<TData> & {
   table: BP_TableInstance<TData>;
   cell: Cell<BP_TableFeatures, TData, unknown>;
+  cellProps?: BP_BodyElementProps;
   /** Absolute index of the row this cell belongs to. */
   rowIndex: number;
   /** Top offset of the row within its quadrant's body, in pixels. */
@@ -44,6 +46,7 @@ export type TableBodyCellProps<TData extends BP_RowData> = BP_RowExpanderOptions
 export function TableBodyCell<TData extends BP_RowData>({
   table,
   cell,
+  cellProps,
   rowIndex,
   rowTop,
   columnRegion,
@@ -76,6 +79,7 @@ export function TableBodyCell<TData extends BP_RowData>({
 
   return (
     <div
+      {...cellProps}
       className={classNames(
         TABLE_CELL,
         TABLE_TRUNCATED_CELL,
@@ -89,8 +93,10 @@ export function TableBodyCell<TData extends BP_RowData>({
           [TABLE_ROW_SELECTED]: cell.row.getIsSelected(),
         },
         bodyCellClassName,
+        cellProps?.className,
       )}
       style={{
+        ...cellProps?.style,
         height: rowHeight,
         left: start,
         position: 'absolute',
@@ -101,11 +107,17 @@ export function TableBodyCell<TData extends BP_RowData>({
         // Selection is driven by TanStack's cell selection plugin; only the
         // primary button starts a selection (right-click opens the context
         // menu instead).
-        if (event.button === 0) {
+        cellProps?.onMouseDown?.(event);
+        if (!event.defaultPrevented && event.button === 0) {
           cell.getSelectionStartHandler()(event);
         }
       }}
-      onMouseEnter={cell.getSelectionExtendHandler()}
+      onMouseEnter={(event) => {
+        cellProps?.onMouseEnter?.(event);
+        if (!event.defaultPrevented) {
+          cell.getSelectionExtendHandler()(event);
+        }
+      }}
     >
       {showExpander ? (
         <div className={TABLE_CELL_WITH_EXPANDER} style={indentation}>

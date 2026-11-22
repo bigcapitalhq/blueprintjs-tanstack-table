@@ -1,6 +1,7 @@
 import type {
   BP_ExpandedRowsState,
   BP_RowData,
+  BP_BodyPropsOptions,
   BP_RowExpanderOptions,
   BP_RowDetailRenderer,
   BP_RowSelectionState,
@@ -36,7 +37,7 @@ import { PaginationRowCountContext } from './pagination/pagination-row-count-con
 import { TableContainer } from './container/TableContainer.tsx';
 
 export type BP_TableProps<TData extends BP_RowData> =
-  BP_TableOptions<BP_TableFeatures, TData> & BP_RowExpanderOptions<TData> & {
+  BP_TableOptions<BP_TableFeatures, TData> & BP_BodyPropsOptions<TData> & BP_RowExpanderOptions<TData> & {
     /**
      * Standard HTML attributes for the table's outer container element (the
      * `<div>` wrapping the quadrants), e.g. `id`, `aria-*` attributes, and
@@ -271,6 +272,8 @@ export function BP_Table<TData extends BP_RowData>({
   initialExpandedRows,
   onExpandedRowsChange,
   renderRowDetail,
+  getRowProps,
+  getCellProps,
   rowExpanderButtonProps,
   rowExpanderIconProps,
   rowDetailHeight = 100,
@@ -369,6 +372,8 @@ export function BP_Table<TData extends BP_RowData>({
       table={table}
       rowHeight={rowHeight}
       renderRowDetail={renderRowDetail}
+      getRowProps={getRowProps}
+      getCellProps={getCellProps}
       rowExpanderButtonProps={rowExpanderButtonProps}
       rowExpanderIconProps={rowExpanderIconProps}
       rowDetailHeight={rowDetailHeight}

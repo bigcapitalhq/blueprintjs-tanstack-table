@@ -28,6 +28,7 @@ import type { BP_RowVirtualizer } from '../../hooks/use-row-virtualizer.ts';
 import type { RowResizingApi } from '../../hooks/use-row-resizing.ts';
 import type {
   BP_RowData,
+  BP_BodyPropsOptions,
   BP_RowExpanderOptions,
   BP_RowDetailRenderer,
   BP_TableInstance,
@@ -39,7 +40,7 @@ import { TableMenu } from '../head/TableMenu.tsx';
 import { TableRowSelectionHeaderCell } from '../head/TableRowSelectionHeaderCell.tsx';
 import { QuadrantType } from './quadrant-type.ts';
 
-export type TableQuadrantProps<TData extends BP_RowData> = BP_RowExpanderOptions<TData> & {
+export type TableQuadrantProps<TData extends BP_RowData> = BP_BodyPropsOptions<TData> & BP_RowExpanderOptions<TData> & {
   quadrantType: QuadrantType;
   table: BP_TableInstance<TData>;
   renderRowDetail?: BP_RowDetailRenderer<TData>;
@@ -101,6 +102,8 @@ export function TableQuadrant<TData extends BP_RowData>({
   quadrantType,
   table,
   renderRowDetail,
+  getRowProps,
+  getCellProps,
   rowExpanderButtonProps,
   rowExpanderIconProps,
   rowHeaderWidth,
@@ -142,6 +145,8 @@ export function TableQuadrant<TData extends BP_RowData>({
     <TableBody
       table={table}
       renderRowDetail={renderRowDetail}
+      getRowProps={getRowProps}
+      getCellProps={getCellProps}
       rowExpanderButtonProps={rowExpanderButtonProps}
       rowExpanderIconProps={rowExpanderIconProps}
       columnRegion={columnRegion}

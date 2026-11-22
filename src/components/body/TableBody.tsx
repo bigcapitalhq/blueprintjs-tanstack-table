@@ -19,6 +19,7 @@ import type { BP_RowVirtualizer } from '../../hooks/use-row-virtualizer.ts';
 import type { RowResizingApi } from '../../hooks/use-row-resizing.ts';
 import type {
   BP_RowData,
+  BP_BodyPropsOptions,
   BP_RowExpanderOptions,
   BP_RowDetailRenderer,
   BP_TableInstance,
@@ -29,7 +30,7 @@ import { TableGhostCells } from './TableGhostCells.tsx';
 import { TableRegionLayer } from '../layers/TableRegionLayer.tsx';
 import { useTableSelection } from '../common/table-selection-context.ts';
 
-export type TableBodyProps<TData extends BP_RowData> = HTMLPropsRef<HTMLDivElement> & BP_RowExpanderOptions<TData> & {
+export type TableBodyProps<TData extends BP_RowData> = HTMLPropsRef<HTMLDivElement> & BP_BodyPropsOptions<TData> & BP_RowExpanderOptions<TData> & {
   table: BP_TableInstance<TData>;
   renderRowDetail?: BP_RowDetailRenderer<TData>;
   /** Which column region this body renders: frozen ("start") or scrollable ("center"). */
@@ -57,6 +58,8 @@ export type TableBodyProps<TData extends BP_RowData> = HTMLPropsRef<HTMLDivEleme
 export function TableBody<TData extends BP_RowData>({
   table,
   renderRowDetail,
+  getRowProps,
+  getCellProps,
   rowExpanderButtonProps,
   rowExpanderIconProps,
   columnRegion,
@@ -123,25 +126,43 @@ export function TableBody<TData extends BP_RowData>({
               const rowTop = rowResizing.getRowTop(rowIndex) - regionTop;
               const rowHeight = rowResizing.getRowHeight(rowIndex);
               const detailHeight = rowResizing.getRowSpanHeight(rowIndex) - rowHeight;
+              const wrapRow = getRowProps !== undefined && cells.length > 0;
+              const rowProps = wrapRow ? getRowProps(row) : undefined;
+              const renderedCells = cells.map((cell, columnIndex) => (
+                <TableBodyCell
+                  key={cell.id}
+                  table={table}
+                  cell={cell}
+                  cellProps={getCellProps?.(cell)}
+                  rowExpanderButtonProps={rowExpanderButtonProps}
+                  rowExpanderIconProps={rowExpanderIconProps}
+                  isExpansionCell={columnRegion === firstColumnRegion && columnIndex === 0}
+                  rowIndex={rowIndex}
+                  rowTop={wrapRow ? 0 : rowTop}
+                  columnRegion={columnRegion}
+                  rowHeight={rowHeight}
+                  loading={areCellsLoading}
+                  isLastInRow={columnIndex === cells.length - 1}
+                  isLastInColumn={rowIndex === lastRowIndex}
+                />
+              ));
               return (
                 <Fragment key={row.id}>
-                  {cells.map((cell, columnIndex) => (
-                    <TableBodyCell
-                      key={cell.id}
-                      table={table}
-                      cell={cell}
-                      rowExpanderButtonProps={rowExpanderButtonProps}
-                      rowExpanderIconProps={rowExpanderIconProps}
-                      isExpansionCell={columnRegion === firstColumnRegion && columnIndex === 0}
-                      rowIndex={rowIndex}
-                      rowTop={rowTop}
-                      columnRegion={columnRegion}
-                      rowHeight={rowHeight}
-                      loading={areCellsLoading}
-                      isLastInRow={columnIndex === cells.length - 1}
-                      isLastInColumn={rowIndex === lastRowIndex}
-                    />
-                  ))}
+                  {wrapRow ? (
+                    <div
+                      {...rowProps}
+                      style={{
+                        ...rowProps?.style,
+                        position: 'absolute',
+                        left: 0,
+                        top: rowTop,
+                        height: rowHeight,
+                        width: regionWidth,
+                      }}
+                    >
+                      {renderedCells}
+                    </div>
+                  ) : renderedCells}
                   {detailHeight > 0 && columnRegion === detailColumnRegion && (
                     <div
                       className={TABLE_ROW_DETAIL}
