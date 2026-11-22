@@ -25,12 +25,9 @@ for all borders with minimal duplication. See the bottom of this file.
     box-shadow: $border-bottom-default;
   }
 
-  // Keep the header divider inside the clipped top quadrants.
+  // Keep dividers inside cells at the edges of clipped quadrants.
   .#{$ns}-table-menu,
-  .#{$ns}-table-row-selection-header-cell {
-    box-shadow: $inset-border-bottom-default, $border-right-default;
-  }
-
+  .#{$ns}-table-row-selection-header-cell,
   .#{$ns}-table-cell {
     box-shadow: $inset-border-bottom-default, $inset-border-right-default;
   }
@@ -40,23 +37,14 @@ for all borders with minimal duplication. See the bottom of this file.
     height: $border-width;
   }
 
-  .#{$ns}-table-column-headers .#{$ns}-table-header {
+  .#{$ns}-table-column-headers .#{$ns}-table-header,
+  .#{$ns}-table-row-headers .#{$ns}-table-header {
     box-shadow: $inset-border-bottom-default, $inset-border-right-default;
 
     &::before {
       bottom: $border-width;
       // hover shadow
       right: $border-width;
-    }
-  }
-
-  .#{$ns}-table-row-headers .#{$ns}-table-header {
-    box-shadow: $inset-border-bottom-default, $border-right-default;
-
-    &::before {
-      bottom: $border-width;
-      // hover shadow
-      right: 0;
     }
   }
 
@@ -101,12 +89,12 @@ for all borders with minimal duplication. See the bottom of this file.
       }
 
       &.#{$ns}-table-last-in-column {
-        box-shadow: $inset-border-bottom-frozen, $border-right-default;
+        box-shadow: $inset-border-bottom-frozen, $inset-border-right-default;
 
         &::before {
           bottom: $frozen-border-width;
           // hover shadow
-          right: 0;
+          right: $border-width;
         }
       }
     }
