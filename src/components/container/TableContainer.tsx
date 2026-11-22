@@ -12,7 +12,7 @@ import {
   type FocusedRegion,
   type Region,
 } from '../common/region.ts';
-import { useCellFocusSelection } from '../../hooks/use-cell-focus-selection.ts';
+import { useCellSelection } from '../../hooks/use-cell-selection.ts';
 import { useColumnHeaderHeight } from '../../hooks/use-column-header-height.ts';
 import { useGhostCells } from '../../hooks/use-ghost-cells.ts';
 import type { RowVirtualizerOptions } from '../../hooks/use-row-virtualizer.ts';
@@ -43,7 +43,6 @@ export type TableContainerProps<TData extends BP_RowData> = HTMLPropsRef<HTMLDiv
     enableGhostCells?: boolean;
     bodyContextMenuRenderer?: BP_BodyContextMenuRenderer<TData>;
     enableBodyContextMenu?: boolean;
-    focusedCell?: FocusedCellCoordinates;
     onFocusedCell?: (cell: FocusedCellCoordinates) => void;
     onFocusedRegion?: (region: FocusedRegion) => void;
     selectedRegions?: Region[];
@@ -74,7 +73,6 @@ export function TableContainer<TData extends BP_RowData>({
   enableGhostCells = false,
   bodyContextMenuRenderer,
   enableBodyContextMenu,
-  focusedCell,
   onFocusedCell,
   onFocusedRegion,
   selectedRegions,
@@ -121,7 +119,7 @@ export function TableContainer<TData extends BP_RowData>({
     onRowHeightChanged,
   });
 
-  const selection = useCellFocusSelection({
+  const selection = useCellSelection({
     table,
     getRowTop: rowResizing.getRowTop,
     getRowHeight: rowResizing.getRowHeight,
@@ -131,7 +129,6 @@ export function TableContainer<TData extends BP_RowData>({
     bodyContextMenuRenderer,
     enableBodyContextMenu,
     enableFocusedCell,
-    focusedCell,
     onFocusedCell,
     onFocusedRegion,
     selectedRegions,

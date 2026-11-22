@@ -123,11 +123,10 @@ export type BP_TableProps<TData extends BP_RowData> =
      */
     enableBodyContextMenu?: boolean;
     /**
-     * A controlled focused cell. When provided, focus state is fully owned by the
-     * caller and updated via `onFocusedCell`.
+     * A callback invoked when the focused cell changes. The focused cell is
+     * the active cell of TanStack's cell selection feature (the anchor of the
+     * most recent selection range); it cannot be controlled directly.
      */
-    focusedCell?: FocusedCellCoordinates;
-    /** Callback invoked when the focused cell changes (controlled or uncontrolled). */
     onFocusedCell?: (cell: FocusedCellCoordinates) => void;
     /** Callback invoked when the focused region changes. */
     onFocusedRegion?: (region: FocusedRegion) => void;
@@ -267,7 +266,6 @@ export function BP_Table<TData extends BP_RowData>({
   enableGhostCells = false,
   bodyContextMenuRenderer,
   enableBodyContextMenu,
-  focusedCell,
   onFocusedCell,
   onFocusedRegion,
   selectedRegions,
@@ -340,7 +338,6 @@ export function BP_Table<TData extends BP_RowData>({
       enableGhostCells={enableGhostCells}
       bodyContextMenuRenderer={bodyContextMenuRenderer}
       enableBodyContextMenu={enableBodyContextMenu}
-      focusedCell={focusedCell}
       onFocusedCell={onFocusedCell}
       onFocusedRegion={onFocusedRegion}
       selectedRegions={selectedRegions}

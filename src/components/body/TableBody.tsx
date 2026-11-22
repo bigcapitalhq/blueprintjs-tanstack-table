@@ -95,9 +95,6 @@ export function TableBody<TData extends BP_RowData>({
           className={classNames(TABLE_BODY_VIRTUAL_CLIENT, TABLE_CELL_CLIENT)}
           style={{ height: regionHeight, width: regionWidth }}
           onPointerDown={selection?.handleBodyPointerDown}
-          onPointerMove={selection?.handleBodyPointerMove}
-          onPointerUp={selection?.handleBodyPointerUp}
-          onPointerCancel={selection?.handleBodyPointerCancel}
           disabled={!isBodyContextMenuEnabled}
           onContextMenu={isBodyContextMenuEnabled ? selection?.handleBodyContextMenu : undefined}
           content={({ mouseEvent }) =>

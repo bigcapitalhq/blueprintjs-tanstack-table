@@ -75,6 +75,15 @@ export function TableBodyCell<TData extends BP_RowData>({
         top: rowTop,
         width: size,
       }}
+      onMouseDown={(event) => {
+        // Selection is driven by TanStack's cell selection plugin; only the
+        // primary button starts a selection (right-click opens the context
+        // menu instead).
+        if (event.button === 0) {
+          cell.getSelectionStartHandler()(event);
+        }
+      }}
+      onMouseEnter={cell.getSelectionExtendHandler()}
     >
       <div className={classNames(TABLE_TRUNCATED_TEXT, TABLE_NO_WRAP_TEXT)}>
         <LoadableContent loading={loading} variableLength>

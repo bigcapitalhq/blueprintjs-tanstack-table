@@ -105,7 +105,7 @@ function regionToStyle<TData extends BP_RowData>(
     size:
       (rowRegion === 'top' ? frozenRowCount : rowCount - frozenRowCount) === 0
         ? 0
-        : getRowTop(rowRegion === 'top' ? 0 : frozenRowCount) +
+        : getRowTop(rowRegion === 'top' ? frozenRowCount - 1 : rowCount - 1) +
           getRowHeight(rowRegion === 'top' ? frozenRowCount - 1 : rowCount - 1) -
           getRowTop(rowRegion === 'top' ? 0 : frozenRowCount),
   };
@@ -132,6 +132,11 @@ function regionToStyle<TData extends BP_RowData>(
   }
 
   if (cols == null || rows == null) {
+    return null;
+  }
+  // Zero-size regions (e.g. the frozen-rows area of a quadrant with no frozen
+  // rows) would still render their borders as a 2px sliver; skip them.
+  if (cols.size <= 0 || rows.size <= 0) {
     return null;
   }
 
