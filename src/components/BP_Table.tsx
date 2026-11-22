@@ -1,5 +1,7 @@
 import type {
   BP_RowData,
+  BP_RowExpanderOptions,
+  BP_RowDetailRenderer,
   BP_RowSelectionState,
   BP_TableFeatures,
   BP_TableOptions,
@@ -10,7 +12,7 @@ import {
   hasLoadingOption,
   TableLoadingOption,
 } from '../types.ts';
-import { useCallback } from 'react';
+import { useCallback, useContext, useLayoutEffect } from 'react';
 import {
   functionalUpdate,
   type Updater,
@@ -32,10 +34,11 @@ import {
   DEFAULT_ROW_SELECTION_COLUMN_WIDTH,
 } from './common/dimensions.ts';
 import type { BP_BodyContextMenuRenderer } from './common/menu-context.ts';
+import { PaginationRowCountContext } from './pagination/pagination-row-count-context.ts';
 import { TableContainer } from './container/TableContainer.tsx';
 
 export type BP_TableProps<TData extends BP_RowData> =
-  BP_TableOptions<BP_TableFeatures, TData> & {
+  BP_TableOptions<BP_TableFeatures, TData> & BP_RowExpanderOptions<TData> & {
     /**
      * Standard HTML attributes for the table's outer container element (the
      * `<div>` wrapping the quadrants), e.g. `id`, `aria-*` attributes, and
@@ -45,6 +48,10 @@ export type BP_TableProps<TData extends BP_RowData> =
     htmlProps?: HTMLPropsRef<HTMLDivElement>;
     /** Height of each body row, in pixels. @default 20 */
     rowHeight?: number;
+    /** Render a detail panel beneath each expanded row. Use getRowCanExpand to limit eligible rows. */
+    renderRowDetail?: BP_RowDetailRenderer<TData>;
+    /** Height of an expanded detail panel in pixels. Longer content scrolls. @default 100 */
+    rowDetailHeight?: number;
     /** Width of the frozen row-header column, in pixels. @default 30 */
     rowHeaderWidth?: number;
     /**
@@ -251,9 +258,15 @@ export type BP_TableProps<TData extends BP_RowData> =
     defaultRowSelection?: BP_RowSelectionState;
   };
 
+const canExpandDetail = () => true;
+
 export function BP_Table<TData extends BP_RowData>({
   htmlProps,
   rowHeight = DEFAULT_ROW_HEIGHT,
+  renderRowDetail,
+  rowExpanderButtonProps,
+  rowExpanderIconProps,
+  rowDetailHeight = 100,
   showRowSelectionCheckboxes = false,
   rowSelectionColumnWidth = DEFAULT_ROW_SELECTION_COLUMN_WIDTH,
   rowHeaderWidth = DEFAULT_ROW_HEADER_WIDTH,
@@ -304,6 +317,8 @@ export function BP_Table<TData extends BP_RowData>({
 
   const table = useBPTableInstance<TData>({
     ...tableOptions,
+    getRowCanExpand: tableOptions.getRowCanExpand ??
+      (renderRowDetail != null && tableOptions.enableExpanding !== false ? canExpandDetail : undefined),
     enableSorting,
     state: {
       ...tableOptions.state,
@@ -312,6 +327,14 @@ export function BP_Table<TData extends BP_RowData>({
     },
     onRowSelectionChange: handleRowSelectionChange,
   });
+
+  const reportRowCount = useContext(PaginationRowCountContext);
+  const paginationRowCount = reportRowCount ? table.getPrePaginatedRowModel().rows.length : undefined;
+  useLayoutEffect(() => {
+    if (paginationRowCount !== undefined) {
+      reportRowCount?.(paginationRowCount);
+    }
+  }, [paginationRowCount, reportRowCount]);
 
   useFreezePinning({ table, numFrozenColumns, numFrozenRows });
 
@@ -322,10 +345,14 @@ export function BP_Table<TData extends BP_RowData>({
   );
   const areRowHeadersLoading = hasLoadingOption(loadingOptions, TableLoadingOption.ROW_HEADERS);
 
-  return (
+  const container = (
     <TableContainer
       table={table}
       rowHeight={rowHeight}
+      renderRowDetail={renderRowDetail}
+      rowExpanderButtonProps={rowExpanderButtonProps}
+      rowExpanderIconProps={rowExpanderIconProps}
+      rowDetailHeight={rowDetailHeight}
       rowHeaderWidth={rowHeaderWidth}
       enableRowHeader={enableRowHeader}
       columnHeaderHeight={columnHeaderHeight}
@@ -355,4 +382,9 @@ export function BP_Table<TData extends BP_RowData>({
       {...htmlProps}
     />
   );
+
+  // A nested table rendered in a cell or detail panel has its own row count.
+  return reportRowCount ? (
+    <PaginationRowCountContext.Provider value={undefined}>{container}</PaginationRowCountContext.Provider>
+  ) : container;
 }

@@ -120,6 +120,7 @@ export function TableRowHeaders<TData extends BP_RowData>({
                   row={rows[rowIndex]}
                   rowIndex={rowIndex}
                   rowHeight={rowResizing.getRowHeight(rowIndex)}
+                  detailHeight={rowResizing.getRowSpanHeight(rowIndex) - rowResizing.getRowHeight(rowIndex)}
                   loading={areRowHeadersLoading}
                   isLastInColumn={rowIndex === lastRowIndex}
                   isResizing={rowResizing.resizingRowIndex === rowIndex}
@@ -157,6 +158,7 @@ export function TableRowHeaders<TData extends BP_RowData>({
                   row={rows[rowIndex]}
                   rowIndex={rowIndex}
                   rowHeight={rowResizing.getRowHeight(rowIndex)}
+                  detailHeight={rowResizing.getRowSpanHeight(rowIndex) - rowResizing.getRowHeight(rowIndex)}
                   loading={areRowHeadersLoading}
                   isLastInColumn={rowIndex === lastRowIndex}
                 />

@@ -12,6 +12,7 @@ import type { BP_RowData } from '../../types.ts';
 import type { BP_TableProps } from '../BP_Table.tsx';
 import { TABLE_PAGINATION_LAYOUT } from '../common/classes.ts';
 import { DEFAULT_PAGE_SIZE } from './constants.ts';
+import { PaginationRowCountContext } from './pagination-row-count-context.ts';
 import { TablePaginationBar } from './TablePaginationBar.tsx';
 
 export type BP_PaginationOptions = {
@@ -114,7 +115,11 @@ export function withPagination<TData extends BP_RowData>(
     );
 
     const isManualPagination = manualPagination === true;
-    const totalRowCount = isManualPagination ? rowCountOption : data.length;
+    const [expandedRowCount, setExpandedRowCount] = useState<number>();
+    const countExpandedRows = !isManualPagination && tableProps.getSubRows != null &&
+      tableProps.paginateExpandedRows !== false;
+    const clientRowCount = countExpandedRows ? expandedRowCount : data.length;
+    const totalRowCount = isManualPagination ? rowCountOption : clientRowCount;
 
     const knownPageCount = useMemo(() => {
       if (isManualPagination) {
@@ -126,8 +131,8 @@ export function withPagination<TData extends BP_RowData>(
         }
         return undefined;
       }
-      return Math.max(1, Math.ceil(data.length / pageSize));
-    }, [data.length, isManualPagination, pageCountOption, pageSize, rowCountOption]);
+      return clientRowCount === undefined ? undefined : Math.max(1, Math.ceil(clientRowCount / pageSize));
+    }, [clientRowCount, isManualPagination, pageCountOption, pageSize, rowCountOption]);
 
     // Keep the page index in range when the page count shrinks (fewer rows, a
     // larger page size, or a smaller manual page count). TanStack's automatic
@@ -182,17 +187,19 @@ export function withPagination<TData extends BP_RowData>(
 
     return (
       <div className={TABLE_PAGINATION_LAYOUT}>
-        <TableComponent
-          {...tableProps}
-          data={data}
-          initialState={initialState}
-          state={{ ...state, pagination }}
-          features={resolvedFeatures}
-          onPaginationChange={handlePaginationChange}
-          manualPagination={manualPagination}
-          pageCount={pageCountOption}
-          rowCount={rowCountOption}
-        />
+        <PaginationRowCountContext.Provider value={countExpandedRows ? setExpandedRowCount : undefined}>
+          <TableComponent
+            {...tableProps}
+            data={data}
+            initialState={initialState}
+            state={{ ...state, pagination }}
+            features={resolvedFeatures}
+            onPaginationChange={handlePaginationChange}
+            manualPagination={manualPagination}
+            pageCount={pageCountOption}
+            rowCount={rowCountOption}
+          />
+        </PaginationRowCountContext.Provider>
         {showPaginationBar && (
           <TablePaginationBar
             className={paginationBarClassName}

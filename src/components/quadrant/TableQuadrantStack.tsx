@@ -19,6 +19,8 @@ import type { RowResizingApi } from '../../hooks/use-row-resizing.ts';
 import type { BP_GhostCells } from '../../hooks/use-ghost-cells.ts';
 import type {
   BP_RowData,
+  BP_RowExpanderOptions,
+  BP_RowDetailRenderer,
   BP_TableInstance,
 } from '../../types.ts';
 import { TableReorderGuides } from '../layers/TableReorderGuides.tsx';
@@ -26,8 +28,9 @@ import { TableResizeGuides } from '../layers/TableResizeGuides.tsx';
 import { TableQuadrant } from './TableQuadrant.tsx';
 import { QuadrantType } from './quadrant-type.ts';
 
-export type TableQuadrantStackProps<TData extends BP_RowData> = {
+export type TableQuadrantStackProps<TData extends BP_RowData> = BP_RowExpanderOptions<TData> & {
   table: BP_TableInstance<TData>;
+  renderRowDetail?: BP_RowDetailRenderer<TData>;
   rowHeaderWidth: number;
   /** Whether to render the row headers (the row-number column) and corner menu. */
   enableRowHeader?: boolean;
@@ -61,6 +64,9 @@ export type TableQuadrantStackProps<TData extends BP_RowData> = {
  */
 export function TableQuadrantStack<TData extends BP_RowData>({
   table,
+  renderRowDetail,
+  rowExpanderButtonProps,
+  rowExpanderIconProps,
   rowHeaderWidth,
   enableRowHeader = true,
   columnHeaderHeight,
@@ -85,7 +91,7 @@ export function TableQuadrantStack<TData extends BP_RowData>({
 
   const frozenColumnsWidth = getFrozenColumnsWidth(table);
   const frozenRowCount = getFrozenRowCount(table);
-  const frozenRowsHeight = getFrozenRowsHeight(table, rowResizing.getRowHeight);
+  const frozenRowsHeight = getFrozenRowsHeight(table, rowResizing.getRowTop);
   // The row numbers and, when enabled, the row-selection checkboxes column form
   // the frozen chrome to the left of the table's columns. Disabling the row
   // headers collapses the row-number column, leaving only the selection column
@@ -97,7 +103,7 @@ export function TableQuadrantStack<TData extends BP_RowData>({
     columnHeaderHeight,
     frozenRowCount,
     frozenRowsHeight,
-    getRowHeight: rowResizing.getRowHeight,
+    getRowHeight: rowResizing.getRowSpanHeight,
     scrollContainerRef,
     enableRowVirtualization: enableRowVirtualization ?? false,
     overscanRowCount: overscanRowCount ?? DEFAULT_OVERSCAN_ROW_COUNT,
@@ -252,6 +258,9 @@ export function TableQuadrantStack<TData extends BP_RowData>({
 
   const baseQuadrantProps = {
     table,
+    renderRowDetail,
+    rowExpanderButtonProps,
+    rowExpanderIconProps,
     rowHeaderWidth,
     enableRowHeader,
     selectionColumnWidth,
