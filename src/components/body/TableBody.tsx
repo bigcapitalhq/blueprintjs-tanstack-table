@@ -1,9 +1,11 @@
+import { Fragment } from 'react';
 import classNames from 'classnames';
 import { ContextMenu } from '@blueprintjs/core';
 import {
   TABLE_BODY_CELLS,
   TABLE_BODY_VIRTUAL_CLIENT,
   TABLE_CELL_CLIENT,
+  TABLE_ROW_DETAIL,
   TABLE_QUADRANT_BODY_CONTAINER,
 } from '../common/classes.ts';
 import {
@@ -17,6 +19,8 @@ import type { BP_RowVirtualizer } from '../../hooks/use-row-virtualizer.ts';
 import type { RowResizingApi } from '../../hooks/use-row-resizing.ts';
 import type {
   BP_RowData,
+  BP_RowExpanderOptions,
+  BP_RowDetailRenderer,
   BP_TableInstance,
   HTMLPropsRef,
 } from '../../types.ts';
@@ -25,8 +29,9 @@ import { TableGhostCells } from './TableGhostCells.tsx';
 import { TableRegionLayer } from '../layers/TableRegionLayer.tsx';
 import { useTableSelection } from '../common/table-selection-context.ts';
 
-export type TableBodyProps<TData extends BP_RowData> = HTMLPropsRef<HTMLDivElement> & {
+export type TableBodyProps<TData extends BP_RowData> = HTMLPropsRef<HTMLDivElement> & BP_RowExpanderOptions<TData> & {
   table: BP_TableInstance<TData>;
+  renderRowDetail?: BP_RowDetailRenderer<TData>;
   /** Which column region this body renders: frozen ("start") or scrollable ("center"). */
   columnRegion: ColumnRegion;
   /** Which row region this body renders: frozen ("top") or scrollable ("center"). */
@@ -51,6 +56,9 @@ export type TableBodyProps<TData extends BP_RowData> = HTMLPropsRef<HTMLDivEleme
  */
 export function TableBody<TData extends BP_RowData>({
   table,
+  renderRowDetail,
+  rowExpanderButtonProps,
+  rowExpanderIconProps,
   columnRegion,
   rowRegion,
   offsetTop = 0,
@@ -73,6 +81,9 @@ export function TableBody<TData extends BP_RowData>({
     ? rowResizing.getRowTop(frozenRowCount)
     : rowResizing.totalHeight - rowResizing.getRowTop(frozenRowCount);
   const regionWidth = getRegionWidth(table, columnRegion);
+
+  const firstColumnRegion = table.getStartVisibleLeafColumns().length > 0 ? 'start' : 'center';
+  const detailColumnRegion = table.getCenterVisibleLeafColumns().length > 0 ? 'center' : 'start';
 
   const isVirtualized = !isTopRegion && rowVirtualizer != null;
   const virtualRows = isVirtualized ? rowVirtualizer.getVirtualItems() : undefined;
@@ -111,20 +122,39 @@ export function TableBody<TData extends BP_RowData>({
                 columnRegion === 'start' ? row.getStartVisibleCells() : row.getCenterVisibleCells();
               const rowTop = rowResizing.getRowTop(rowIndex) - regionTop;
               const rowHeight = rowResizing.getRowHeight(rowIndex);
-              return cells.map((cell, columnIndex) => (
-                <TableBodyCell
-                  key={cell.id}
-                  table={table}
-                  cell={cell}
-                  rowIndex={rowIndex}
-                  rowTop={rowTop}
-                  columnRegion={columnRegion}
-                  rowHeight={rowHeight}
-                  loading={areCellsLoading}
-                  isLastInRow={columnIndex === cells.length - 1}
-                  isLastInColumn={rowIndex === lastRowIndex}
-                />
-              ));
+              const detailHeight = rowResizing.getRowSpanHeight(rowIndex) - rowHeight;
+              return (
+                <Fragment key={row.id}>
+                  {cells.map((cell, columnIndex) => (
+                    <TableBodyCell
+                      key={cell.id}
+                      table={table}
+                      cell={cell}
+                      rowExpanderButtonProps={rowExpanderButtonProps}
+                      rowExpanderIconProps={rowExpanderIconProps}
+                      isExpansionCell={columnRegion === firstColumnRegion && columnIndex === 0}
+                      rowIndex={rowIndex}
+                      rowTop={rowTop}
+                      columnRegion={columnRegion}
+                      rowHeight={rowHeight}
+                      loading={areCellsLoading}
+                      isLastInRow={columnIndex === cells.length - 1}
+                      isLastInColumn={rowIndex === lastRowIndex}
+                    />
+                  ))}
+                  {detailHeight > 0 && columnRegion === detailColumnRegion && (
+                    <div
+                      className={TABLE_ROW_DETAIL}
+                      style={{ top: rowTop + rowHeight, height: detailHeight, width: regionWidth }}
+                      onPointerDown={(event) => event.stopPropagation()}
+                      onKeyDown={(event) => event.stopPropagation()}
+                      onContextMenu={(event) => event.stopPropagation()}
+                    >
+                      {renderRowDetail?.(row)}
+                    </div>
+                  )}
+                </Fragment>
+              );
             })}
             {ghosts != null && (
               <TableGhostCells

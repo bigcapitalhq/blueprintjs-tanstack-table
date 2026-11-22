@@ -12,6 +12,7 @@ import type { BP_MenuContext } from './common/menu-context.ts';
 import {
   TableLoadingOption,
   type BP_RowSelectionState,
+  type BP_ExpandedRowsState,
   type BP_TableFeatures,
   type BP_VisibilityState,
 } from '../types.ts';
@@ -22,6 +23,7 @@ type Person = {
   name: string;
   age: number;
   role: string;
+  children?: Person[];
 };
 
 const helper = createColumnHelper<BP_TableFeatures, Person>();
@@ -80,6 +82,55 @@ export const Basic: Story = {
       </div>
     ),
   ],
+};
+
+const biographies: Record<number, string> = {
+  1: 'Ada Lovelace described how the Analytical Engine could calculate Bernoulli numbers.',
+  2: 'Alan Turing used a simple abstract machine to explore which problems can be computed.',
+  3: 'Grace Hopper developed an early compiler and helped shape COBOL.',
+};
+
+export const RowDetails: Story = {
+  args: {
+    data,
+    columns,
+    getRowId: (person) => String(person.id),
+    renderRowDetail: (row) => <p>{biographies[row.original.id]}</p>,
+    initialExpandedRows: { '1': true },
+    rowDetailHeight: 72,
+    rowExpanderIconProps: { size: 16 },
+    rowExpanderButtonProps: (row) => ({
+      title: `${row.getIsExpanded() ? 'Hide' : 'Read'} biography for ${row.original.name}`,
+    }),
+  },
+  decorators: Basic.decorators,
+};
+
+export const ControlledRowDetails: Story = {
+  args: RowDetails.args,
+  decorators: Basic.decorators,
+  render: function ControlledRowDetailsTable(args) {
+    const [expandedRows, setExpandedRows] = useState<BP_ExpandedRowsState>({});
+    return (
+      <>
+        <div className="bp-table-demo-toolbar">
+          <Button onClick={() => setExpandedRows(true)}>Expand all</Button>
+          <Button onClick={() => setExpandedRows({})}>Collapse all</Button>
+        </div>
+        <BP_Table {...args} expandedRows={expandedRows} onExpandedRowsChange={setExpandedRows} />
+      </>
+    );
+  },
+};
+
+export const ExpandingSubRows: Story = {
+  args: {
+    data: [{ ...data[0], children: [data[1]] }, data[2]],
+    columns,
+    getRowId: (person) => String(person.id),
+    getSubRows: (person) => person.children,
+  },
+  decorators: Basic.decorators,
 };
 
 export const ColumnGroups: Story = {

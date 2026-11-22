@@ -1,5 +1,8 @@
 import type {
+  BP_ExpandedRowsState,
   BP_RowData,
+  BP_RowExpanderOptions,
+  BP_RowDetailRenderer,
   BP_RowSelectionState,
   BP_TableFeatures,
   BP_TableOptions,
@@ -10,11 +13,8 @@ import {
   hasLoadingOption,
   TableLoadingOption,
 } from '../types.ts';
-import { useCallback } from 'react';
-import {
-  functionalUpdate,
-  type Updater,
-} from '@tanstack/react-table';
+import { useContext, useLayoutEffect } from 'react';
+import { functionalUpdate } from '@tanstack/react-table';
 import { useBPTableInstance } from '../hooks/use-bp-table-instance.ts';
 import { useFreezePinning } from '../hooks/use-freeze-pinning.ts';
 import { DEFAULT_OVERSCAN_ROW_COUNT } from '../hooks/use-row-virtualizer.ts';
@@ -32,10 +32,11 @@ import {
   DEFAULT_ROW_SELECTION_COLUMN_WIDTH,
 } from './common/dimensions.ts';
 import type { BP_BodyContextMenuRenderer } from './common/menu-context.ts';
+import { PaginationRowCountContext } from './pagination/pagination-row-count-context.ts';
 import { TableContainer } from './container/TableContainer.tsx';
 
 export type BP_TableProps<TData extends BP_RowData> =
-  BP_TableOptions<BP_TableFeatures, TData> & {
+  BP_TableOptions<BP_TableFeatures, TData> & BP_RowExpanderOptions<TData> & {
     /**
      * Standard HTML attributes for the table's outer container element (the
      * `<div>` wrapping the quadrants), e.g. `id`, `aria-*` attributes, and
@@ -45,6 +46,16 @@ export type BP_TableProps<TData extends BP_RowData> =
     htmlProps?: HTMLPropsRef<HTMLDivElement>;
     /** Height of each body row, in pixels. @default 20 */
     rowHeight?: number;
+    /** Controlled expansion. Takes precedence over state.expanded. */
+    expandedRows?: BP_ExpandedRowsState;
+    /** Initial uncontrolled expansion and reset target. Takes precedence over initialState.expanded. */
+    initialExpandedRows?: BP_ExpandedRowsState;
+    /** Receives the next expanded state for each requested change in either mode. */
+    onExpandedRowsChange?: (expandedRows: BP_ExpandedRowsState) => void;
+    /** Render a detail panel beneath each expanded row. Use getRowCanExpand to limit eligible rows. */
+    renderRowDetail?: BP_RowDetailRenderer<TData>;
+    /** Height of an expanded detail panel in pixels. Longer content scrolls. @default 100 */
+    rowDetailHeight?: number;
     /** Width of the frozen row-header column, in pixels. @default 30 */
     rowHeaderWidth?: number;
     /**
@@ -251,9 +262,18 @@ export type BP_TableProps<TData extends BP_RowData> =
     defaultRowSelection?: BP_RowSelectionState;
   };
 
+const canExpandDetail = () => true;
+
 export function BP_Table<TData extends BP_RowData>({
   htmlProps,
   rowHeight = DEFAULT_ROW_HEIGHT,
+  expandedRows,
+  initialExpandedRows,
+  onExpandedRowsChange,
+  renderRowDetail,
+  rowExpanderButtonProps,
+  rowExpanderIconProps,
+  rowDetailHeight = 100,
   showRowSelectionCheckboxes = false,
   rowSelectionColumnWidth = DEFAULT_ROW_SELECTION_COLUMN_WIDTH,
   rowHeaderWidth = DEFAULT_ROW_HEADER_WIDTH,
@@ -293,25 +313,47 @@ export function BP_Table<TData extends BP_RowData>({
     onChange: tableOptions.onRowSelectionChange,
   });
 
-  // TanStack hands out state updaters; the uncontrolled hook consumes plain
-  // values, so resolve the updater against the current selection first.
-  const handleRowSelectionChange = useCallback(
-    (updater: Updater<BP_RowSelectionState>) => {
-      setResolvedRowSelection(functionalUpdate(updater, resolvedRowSelection));
-    },
-    [resolvedRowSelection, setResolvedRowSelection],
-  );
+  const expandedAtom = tableOptions.atoms?.expanded;
+  const [resolvedExpandedRows, setExpandedRows] = useUncontrolled<BP_ExpandedRowsState>({
+    value: expandedAtom?.get() ?? expandedRows ?? tableOptions.state?.expanded,
+    initialValue: initialExpandedRows ?? tableOptions.initialState?.expanded,
+    finalValue: {},
+    onChange: onExpandedRowsChange,
+  });
 
   const table = useBPTableInstance<TData>({
     ...tableOptions,
+    initialState: initialExpandedRows === undefined ? tableOptions.initialState : {
+      ...tableOptions.initialState,
+      expanded: initialExpandedRows,
+    },
+    getRowCanExpand: tableOptions.getRowCanExpand ??
+      (renderRowDetail != null && tableOptions.enableExpanding !== false ? canExpandDetail : undefined),
     enableSorting,
     state: {
       ...tableOptions.state,
       ...(columnVisibility !== undefined ? { columnVisibility } : {}),
       rowSelection: resolvedRowSelection,
+      expanded: resolvedExpandedRows,
     },
-    onRowSelectionChange: handleRowSelectionChange,
+    onRowSelectionChange: setResolvedRowSelection,
+    onExpandedChange: (updater) => {
+      setExpandedRows(updater);
+      if (tableOptions.onExpandedChange) {
+        tableOptions.onExpandedChange(updater);
+      } else {
+        expandedAtom?.set((previous) => functionalUpdate(updater, previous));
+      }
+    },
   });
+
+  const reportRowCount = useContext(PaginationRowCountContext);
+  const paginationRowCount = reportRowCount ? table.getPrePaginatedRowModel().rows.length : undefined;
+  useLayoutEffect(() => {
+    if (paginationRowCount !== undefined) {
+      reportRowCount?.(paginationRowCount);
+    }
+  }, [paginationRowCount, reportRowCount]);
 
   useFreezePinning({ table, numFrozenColumns, numFrozenRows });
 
@@ -322,10 +364,14 @@ export function BP_Table<TData extends BP_RowData>({
   );
   const areRowHeadersLoading = hasLoadingOption(loadingOptions, TableLoadingOption.ROW_HEADERS);
 
-  return (
+  const container = (
     <TableContainer
       table={table}
       rowHeight={rowHeight}
+      renderRowDetail={renderRowDetail}
+      rowExpanderButtonProps={rowExpanderButtonProps}
+      rowExpanderIconProps={rowExpanderIconProps}
+      rowDetailHeight={rowDetailHeight}
       rowHeaderWidth={rowHeaderWidth}
       enableRowHeader={enableRowHeader}
       columnHeaderHeight={columnHeaderHeight}
@@ -355,4 +401,9 @@ export function BP_Table<TData extends BP_RowData>({
       {...htmlProps}
     />
   );
+
+  // A nested table rendered in a cell or detail panel has its own row count.
+  return reportRowCount ? (
+    <PaginationRowCountContext.Provider value={undefined}>{container}</PaginationRowCountContext.Provider>
+  ) : container;
 }

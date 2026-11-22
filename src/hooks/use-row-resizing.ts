@@ -26,6 +26,8 @@ export type RowResizingOptions = {
   rowHeight: number;
   /** Number of rows in the table. */
   rowCount: number;
+  /** Extra space below the row cells for an expanded detail panel. */
+  getDetailHeight?: (index: number) => number;
   /**
    * Controlled per-row heights, indexed by row index. When provided, the
    * table's row heights are fully owned by the caller, who updates them via
@@ -58,6 +60,8 @@ export type RowResizingApi = {
   enabled: boolean;
   /** Resolved height of the row at `index`. */
   getRowHeight: (index: number) => number;
+  /** Height occupied by both the row and its detail panel. */
+  getRowSpanHeight: (index: number) => number;
   /** Resolved absolute top offset of the row at `index` within the body. */
   getRowTop: (index: number) => number;
   /** Total height of all rows combined. */
@@ -73,6 +77,7 @@ export type RowResizingApi = {
 export function useRowResizing({
   rowHeight,
   rowCount,
+  getDetailHeight,
   rowHeights,
   defaultRowHeights,
   enableRowResizing = false,
@@ -111,16 +116,19 @@ export function useRowResizing({
 
   // Cumulative row offsets, recomputed whenever the resolved heights change.
   const { rowTops, totalHeight } = useMemo(() => {
-    const tops = new Array<number>(rowCount);
+    const tops = new Array<number>(rowCount + 1);
     let top = 0;
     for (let i = 0; i < rowCount; i++) {
       tops[i] = top;
-      top += getRowHeight(i);
+      top += getRowHeight(i) + (getDetailHeight?.(i) ?? 0);
     }
+    tops[rowCount] = top;
     return { rowTops: tops, totalHeight: top };
-  }, [getRowHeight, rowCount]);
+  }, [getDetailHeight, getRowHeight, rowCount]);
 
   const getRowTop = useCallback((index: number) => rowTops[index] ?? 0, [rowTops]);
+
+  const getRowSpanHeight = useCallback((index: number) => rowTops[index + 1] - rowTops[index], [rowTops]);
 
   // Refs mirror the latest values so the window-level drag listeners can stay
   // stable for the entire lifetime of a drag (the same trick used by
@@ -217,6 +225,7 @@ export function useRowResizing({
   return {
     enabled: enableRowResizing,
     getRowHeight,
+    getRowSpanHeight,
     getRowTop,
     totalHeight,
     resizingRowIndex,
