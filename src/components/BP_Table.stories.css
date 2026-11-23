@@ -2,6 +2,17 @@
   height: 400px;
 }
 
+.bp-table-demo-clipboard-table {
+  height: 100px;
+  margin-bottom: 12px;
+}
+
+.bp-table-demo-clipboard-paste {
+  display: block;
+  max-width: 100%;
+  width: 450px;
+}
+
 .bp-table-demo-alignment .bp6-table-column-header-tr {
   min-height: 64px;
 }

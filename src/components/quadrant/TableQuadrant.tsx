@@ -134,6 +134,8 @@ export function TableQuadrant<TData extends BP_RowData>({
   const showsMenu = quadrantType === QuadrantType.TOP_LEFT;
 
   const selection = useTableSelection();
+  // A click in a frozen quadrant gives its scroll container browser focus.
+  const acceptsKeyboardEvents = isMain || selection?.handleCopy != null;
   const frozenColumnsWidth = getFrozenColumnsWidth(table);
   const frozenRowsHeight = getFrozenRowsHeight(table, rowResizing.getRowTop);
   // The row-number column collapses when the row headers are disabled; the
@@ -268,8 +270,9 @@ export function TableQuadrant<TData extends BP_RowData>({
       <div
         ref={scrollContainerRef}
         className={TABLE_QUADRANT_SCROLL_CONTAINER}
-        tabIndex={isMain && selection != null ? 0 : undefined}
-        onKeyDown={isMain ? selection?.handleKeyDown : undefined}
+        tabIndex={selection && acceptsKeyboardEvents ? (isMain ? 0 : -1) : undefined}
+        onKeyDown={acceptsKeyboardEvents ? selection?.handleKeyDown : undefined}
+        onCopy={selection?.handleCopy}
         onScroll={onScroll}
         onWheel={onWheel}
       >

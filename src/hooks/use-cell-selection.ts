@@ -3,6 +3,7 @@ import {
   useEffect,
   useMemo,
   useRef,
+  type ClipboardEvent as ReactClipboardEvent,
   type KeyboardEvent as ReactKeyboardEvent,
   type MouseEvent as ReactMouseEvent,
   type MutableRefObject,
@@ -28,6 +29,7 @@ import {
   getCellAtCoordinates,
   getFocusedCellCoordinates,
   getSelectedCellRegions,
+  getSelectedCellText,
   regionsToCellSelectionRanges,
 } from '../components/common/cell-selection.ts';
 import {
@@ -62,6 +64,7 @@ export type CellSelectionOptions<TData extends BP_RowData> = {
   enableBodyContextMenu?: boolean;
 
   enableFocusedCell?: boolean;
+  enableCopyOnSelect?: boolean;
   onFocusedCell?: (cell: FocusedCellCoordinates) => void;
   onFocusedRegion?: (region: FocusedRegion) => void;
 
@@ -79,6 +82,7 @@ export type CellSelectionApi = {
   regionGroups: StyledRegionGroup[];
   isSelectionModeEnabled: (cardinality: RegionCardinality) => boolean;
   handleKeyDown: (event: ReactKeyboardEvent<HTMLDivElement>) => void;
+  handleCopy?: (event: ReactClipboardEvent<HTMLDivElement>) => void;
   /** Focuses the scroll container so keyboard navigation keeps working. */
   handleBodyPointerDown: (event: ReactPointerEvent<HTMLElement>) => void;
   handleColumnHeaderMouseDown: (index: number, event: ReactMouseEvent) => void;
@@ -129,6 +133,7 @@ export function useCellSelection<TData extends BP_RowData>({
   bodyContextMenuRenderer,
   enableBodyContextMenu,
   enableFocusedCell = false,
+  enableCopyOnSelect = false,
   onFocusedCell,
   onFocusedRegion,
   selectedRegions: controlledSelectedRegions,
@@ -254,10 +259,26 @@ export function useCellSelection<TData extends BP_RowData>({
   }, [enableFocusedCell, focusedCell, onFocusedCell, onFocusedRegion]);
 
   const focusContainer = useCallback(() => {
-    if (enableFocusedCell) {
+    if (enableFocusedCell || enableCopyOnSelect) {
       scrollContainerRef.current?.focus();
     }
-  }, [enableFocusedCell, scrollContainerRef]);
+  }, [enableCopyOnSelect, enableFocusedCell, scrollContainerRef]);
+
+  const handleCopy = useCallback((event: ReactClipboardEvent<HTMLDivElement>) => {
+    // Editors and nested tables own their native copy events.
+    if (
+      event.defaultPrevented ||
+      event.target !== event.currentTarget ||
+      event.currentTarget.ownerDocument.getSelection()?.isCollapsed === false
+    ) {
+      return;
+    }
+    const text = getSelectedCellText(table);
+    if (text !== undefined) {
+      event.clipboardData.setData('text/plain', text);
+      event.preventDefault();
+    }
+  }, [table]);
 
   const scrollToFocusedCell = useCallback(() => {
     const focused = getFocusedCellCoordinates(table);
@@ -341,6 +362,10 @@ export function useCellSelection<TData extends BP_RowData>({
 
   const handleKeyDown = useCallback(
     (event: ReactKeyboardEvent<HTMLDivElement>) => {
+      // Only the main viewport historically handles keys bubbling from children.
+      if (event.currentTarget !== scrollContainerRef.current && event.target !== event.currentTarget) {
+        return;
+      }
       const modifier = event.metaKey || event.ctrlKey;
       const key = event.key;
 
@@ -388,7 +413,7 @@ export function useCellSelection<TData extends BP_RowData>({
         table.selectAllCells();
       }
     },
-    [enableFocusedCell, table],
+    [enableFocusedCell, scrollContainerRef, table],
   );
 
   const getCellFromEvent = useCallback(
@@ -579,6 +604,7 @@ export function useCellSelection<TData extends BP_RowData>({
     handleBodyContextMenu,
     handleBodyPointerDown,
     handleColumnHeaderMouseDown,
+    handleCopy: enableCopyOnSelect ? handleCopy : undefined,
     handleKeyDown,
     handleMenuMouseDown,
     handleRowHeaderMouseDown,

@@ -46,6 +46,7 @@ export type TableContainerProps<TData extends BP_RowData> = HTMLPropsRef<HTMLDiv
     enableColumnReordering?: boolean;
     enableSorting?: boolean;
     enableFocusedCell?: boolean;
+    enableCopyOnSelect?: boolean;
     enableGhostCells?: boolean;
     bodyContextMenuRenderer?: BP_BodyContextMenuRenderer<TData>;
     enableBodyContextMenu?: boolean;
@@ -81,6 +82,7 @@ export function TableContainer<TData extends BP_RowData>({
   areColumnHeadersLoading,
   areRowHeadersLoading,
   enableFocusedCell = false,
+  enableCopyOnSelect = false,
   enableGhostCells = false,
   bodyContextMenuRenderer,
   enableBodyContextMenu,
@@ -152,6 +154,7 @@ export function TableContainer<TData extends BP_RowData>({
     bodyContextMenuRenderer,
     enableBodyContextMenu,
     enableFocusedCell,
+    enableCopyOnSelect,
     onFocusedCell,
     onFocusedRegion,
     selectedRegions,
