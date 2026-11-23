@@ -643,7 +643,11 @@ export const EditableCells: Story = {
       const editableColumns = useMemo(
         () =>
           employeeHelper.columns([
-            employeeHelper.accessor('id', { header: 'ID', size: 60 }),
+            employeeHelper.accessor('id', {
+              header: 'ID',
+              size: 60,
+              meta: { textAlign: 'end', verticalAlign: 'middle' },
+            }),
             employeeHelper.accessor('name', {
               header: 'Name',
               size: 220,
@@ -670,7 +674,7 @@ export const EditableCells: Story = {
               size: 80,
               meta: {
                 bodyCellClassName: 'bp-table-demo-cell',
-                headCellClassName: 'bp-table-demo-head-centered',
+                textAlign: 'center',
               },
               cell: (info) => (
                 <div
@@ -704,8 +708,8 @@ export const EditableCells: Story = {
             Cell renderers are ordinary React components: a Blueprint <code>InputGroup</code>{' '}
             for Name, a <code>Checkbox</code> for Active, and a <code>Tag</code> whose intent
             follows the Role value. Rows live in the story state and every edit flows back
-            through <code>setEmployees</code>. Columns style their body and header cells through{' '}
-            <code>meta.bodyCellClassName</code> / <code>meta.headCellClassName</code>, and editors
+            through <code>setEmployees</code>. The ID column uses <code>meta.textAlign</code> and{' '}
+            <code>meta.verticalAlign</code> for its header and values. Editors
             stop key/pointer propagation so the table selection and keyboard handling do not
             interfere with typing.
           </p>

@@ -2,6 +2,10 @@
   height: 400px;
 }
 
+.bp-table-demo-alignment .bp6-table-column-header-tr {
+  min-height: 64px;
+}
+
 .bp-table-demo-toolbar {
   display: flex;
   flex-wrap: wrap;
@@ -17,7 +21,7 @@
 
 /*
  * Cell layout is declared per column through column metadata:
- * `meta: { cellClassName: 'bp-table-demo-cell' }`. Compound selectors keep
+ * `meta: { bodyCellClassName: 'bp-table-demo-cell' }`. Compound selectors keep
  * these overrides stable regardless of stylesheet order, and `user-select:
  * text` re-enables text selection inside editors, which the table scroll
  * container disables globally.
@@ -57,11 +61,6 @@
 /* Text input cells sit flush against the cell edges. */
 .bp6-table-cell.bp-table-demo-cell-input {
   padding: 0;
-}
-
-/* Demonstrated via `meta.headCellClassName` on the Active column. */
-.bp-table-demo-head-centered .bp6-table-column-name-text {
-  text-align: center;
 }
 
 .bp6-table-cell.account-inactive {

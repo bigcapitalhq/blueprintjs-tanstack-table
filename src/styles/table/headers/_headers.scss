@@ -351,6 +351,22 @@ $dark-selectable-header-menu-selected-hover-background: menu-background(
   flex-direction: column;
   font-size: $pt-font-size;
   text-align: left;
+
+  &[data-vertical-align] {
+    height: 100%;
+
+    > .#{$ns}-table-column-name-text {
+      flex-grow: 0;
+    }
+  }
+
+  &[data-vertical-align="middle"] > .#{$ns}-table-column-name-text {
+    margin-block: auto;
+  }
+
+  &[data-vertical-align="bottom"] > .#{$ns}-table-column-name-text {
+    margin-block-start: auto;
+  }
 }
 
 .#{$ns}-table-row-name {
