@@ -31,6 +31,7 @@ export default defineConfig({
         'react/jsx-runtime',
         '@blueprintjs/core',
         '@blueprintjs/icons',
+        '@blueprintjs/select',
         '@tanstack/react-table',
         '@tanstack/react-virtual',
       ],

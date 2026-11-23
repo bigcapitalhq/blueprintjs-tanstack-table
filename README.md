@@ -50,7 +50,7 @@ The table renders with Blueprint's visual language, so your app must already
 be styled with Blueprint and have React 18 installed:
 
 ```bash
-npm install @blueprintjs/core @blueprintjs/icons react react-dom @tanstack/react-table @tanstack/react-virtual
+npm install @blueprintjs/core @blueprintjs/icons @blueprintjs/select react react-dom @tanstack/react-table @tanstack/react-virtual
 ```
 
 Import the compiled table styles once, alongside Blueprint's own styles (if
@@ -59,6 +59,7 @@ you don't already import them):
 ```tsx
 import '@blueprintjs/core/lib/css/blueprint.css';
 import '@blueprintjs/icons/lib/css/blueprint-icons.css';
+import '@blueprintjs/select/lib/css/blueprint-select.css';
 import 'blueprintjs-react-table/styles.css';
 
 import { BP_Table } from 'blueprintjs-react-table';
@@ -335,6 +336,26 @@ Pagination options (on top of every `BP_TableProps`):
 | `pageSizeOptions` | `readonly number[]` | `[10, 20, 50, 100]` | Page sizes offered by the bar's select. |
 | `showPaginationBar` | `boolean` | `true` | Hide the bar while keeping the table paginated. |
 | `paginationBarClassName` | `string` | — | Class name(s) for the pagination bar. |
+
+Both `PaginatedTable` and `TablePaginationBar` accept Blueprint props for their controls:
+
+```tsx
+<PaginatedTable
+  data={data}
+  columns={columns}
+  paginationButtonProps={(action) => ({
+    size: 'small',
+    intent: action === 'next' ? 'primary' : 'none',
+  })}
+  pageSizeSelectProps={{ popoverProps: { placement: 'top-start' } }}
+  pageSizeButtonProps={{ size: 'small', variant: 'outlined' }}
+/>
+```
+
+Pass a single `ButtonProps` object to style all four navigation buttons, or
+use the callback to customize `first`, `previous`, `next`, and `last` individually.
+A button's `onClick` runs before navigation and can cancel it with `event.preventDefault()`.
+Use `pageSizeOptions` to set the select's items.
 
 Pagination becomes controlled when `state.pagination` is provided; pair it with
 `onPaginationChange`:

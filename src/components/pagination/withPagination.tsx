@@ -13,9 +13,9 @@ import type { BP_TableProps } from '../BP_Table.tsx';
 import { TABLE_PAGINATION_LAYOUT } from '../common/classes.ts';
 import { DEFAULT_PAGE_SIZE } from './constants.ts';
 import { PaginationRowCountContext } from './pagination-row-count-context.ts';
-import { TablePaginationBar } from './TablePaginationBar.tsx';
+import { TablePaginationBar, type PaginationControlProps } from './TablePaginationBar.tsx';
 
-export type BP_PaginationOptions = {
+export type BP_PaginationOptions = PaginationControlProps & {
   /**
    * Initial page size for uncontrolled pagination. Ignored when
    * `state.pagination` or `initialState.pagination` is provided.
@@ -91,6 +91,9 @@ export function withPagination<TData extends BP_RowData>(
     initialPageIndex = 0,
     initialPageSize = DEFAULT_PAGE_SIZE,
     pageSizeOptions,
+    paginationButtonProps,
+    pageSizeSelectProps,
+    pageSizeButtonProps,
     showPaginationBar = true,
     paginationBarClassName,
     ...tableProps
@@ -209,6 +212,9 @@ export function withPagination<TData extends BP_RowData>(
             pageIndex={pageIndex}
             pageSize={pageSize}
             pageSizeOptions={pageSizeOptions}
+            paginationButtonProps={paginationButtonProps}
+            pageSizeSelectProps={pageSizeSelectProps}
+            pageSizeButtonProps={pageSizeButtonProps}
             rowCount={totalRowCount}
           />
         )}
