@@ -23,7 +23,7 @@ export type {
 } from './components/pagination/withPagination.tsx';
 
 export { TablePaginationBar } from './components/pagination/TablePaginationBar.tsx';
-export type { TablePaginationBarProps } from './components/pagination/TablePaginationBar.tsx';
+export type { PaginationControlProps, TablePaginationBarProps } from './components/pagination/TablePaginationBar.tsx';
 
 export {
   DEFAULT_PAGE_SIZE,

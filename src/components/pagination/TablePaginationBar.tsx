@@ -1,5 +1,7 @@
 import classNames from 'classnames';
-import { Button, ButtonGroup, HTMLSelect } from '@blueprintjs/core';
+import { Button, ButtonGroup, MenuItem, type ButtonProps } from '@blueprintjs/core';
+import { Select, type SelectProps } from '@blueprintjs/select';
+import { useMemo } from 'react';
 import {
   TABLE_PAGINATION_BAR,
   TABLE_PAGINATION_BAR_CONTROLS,
@@ -7,7 +9,18 @@ import {
 } from '../common/classes.ts';
 import { DEFAULT_PAGE_SIZE_OPTIONS } from './constants.ts';
 
-export type TablePaginationBarProps = {
+type PageAction = 'first' | 'previous' | 'next' | 'last';
+
+export type PaginationControlProps = {
+  /** Shared navigation button props, or a function that returns props for each action. */
+  paginationButtonProps?: ButtonProps | ((action: PageAction) => ButtonProps);
+  /** Blueprint Select props for the rows-per-page menu. Use pageSizeOptions to supply its items. */
+  pageSizeSelectProps?: Partial<Omit<SelectProps<number>, 'items' | 'children'>>;
+  /** Blueprint Button props for the trigger that displays the current page size. */
+  pageSizeButtonProps?: ButtonProps;
+};
+
+export type TablePaginationBarProps = PaginationControlProps & {
   /** Zero-based index of the current page. */
   pageIndex: number;
   /** Number of rows shown per page. */
@@ -43,6 +56,9 @@ export function TablePaginationBar({
   pageCount,
   rowCount,
   pageSizeOptions = DEFAULT_PAGE_SIZE_OPTIONS,
+  paginationButtonProps,
+  pageSizeSelectProps,
+  pageSizeButtonProps,
   onPageIndexChange,
   onPageSizeChange,
   className,
@@ -50,6 +66,30 @@ export function TablePaginationBar({
   const knownPageCount = pageCount != null && pageCount >= 0 ? pageCount : undefined;
   const canPrevious = pageIndex > 0;
   const canNext = knownPageCount === undefined ? true : pageIndex < knownPageCount - 1;
+  const pageSizeDisabled = pageSizeSelectProps?.disabled || pageSizeButtonProps?.disabled;
+
+  function renderPageButton(
+    action: PageAction,
+    label: string,
+    icon: ButtonProps['icon'],
+    targetPage: number | undefined,
+  ) {
+    const props = typeof paginationButtonProps === 'function'
+      ? paginationButtonProps(action)
+      : paginationButtonProps;
+    return (
+      <Button
+        aria-label={label}
+        icon={icon}
+        {...props}
+        disabled={targetPage === undefined || props?.disabled}
+        onClick={(event) => {
+          props?.onClick?.(event);
+          if (targetPage !== undefined && !event.defaultPrevented) onPageIndexChange(targetPage);
+        }}
+      />
+    );
+  }
 
   const firstRowNumber = rowCount === undefined || rowCount === 0 ? 0 : pageIndex * pageSize + 1;
   const lastRowNumber =
@@ -57,20 +97,50 @@ export function TablePaginationBar({
 
   // Keep the current page size selectable even when it is not one of the
   // offered options (e.g. it came from controlled state).
-  const selectablePageSizes = pageSizeOptions.includes(pageSize)
-    ? pageSizeOptions
-    : [...pageSizeOptions, pageSize].sort((a, b) => a - b);
+  const selectablePageSizes = useMemo(
+    () => pageSizeOptions.includes(pageSize)
+      ? [...pageSizeOptions]
+      : [...pageSizeOptions, pageSize].sort((a, b) => a - b),
+    [pageSize, pageSizeOptions],
+  );
 
   return (
     <div className={classNames(TABLE_PAGINATION_BAR, className)}>
       <div className={TABLE_PAGINATION_BAR_CONTROLS}>
         <span className={TABLE_PAGINATION_BAR_TEXT}>Rows per page:</span>
-        <HTMLSelect
-          aria-label="Rows per page"
-          onChange={(event) => onPageSizeChange(Number(event.currentTarget.value))}
-          options={selectablePageSizes}
-          value={pageSize}
-        />
+        <Select<number>
+          filterable={false}
+          {...pageSizeSelectProps}
+          items={selectablePageSizes}
+          itemRenderer={pageSizeSelectProps?.itemRenderer ?? ((size, { handleClick, handleFocus, id, modifiers, ref }) => (
+            <MenuItem
+              active={modifiers.active}
+              disabled={modifiers.disabled}
+              id={id}
+              key={size}
+              onClick={handleClick}
+              onFocus={handleFocus}
+              ref={ref}
+              roleStructure="listoption"
+              selected={size === pageSize}
+              text={size}
+            />
+          ))}
+          disabled={pageSizeDisabled}
+          onItemSelect={(size, event) => {
+            pageSizeSelectProps?.onItemSelect?.(size, event);
+            if (size !== pageSize) onPageSizeChange(size);
+          }}
+          popoverTargetProps={{ 'aria-label': 'Rows per page', ...pageSizeSelectProps?.popoverTargetProps }}
+        >
+          <Button
+            aria-label={`Rows per page: ${pageSize}`}
+            endIcon="double-caret-vertical"
+            text={pageSize}
+            {...pageSizeButtonProps}
+            disabled={pageSizeDisabled}
+          />
+        </Select>
         {rowCount !== undefined && (
           <span className={TABLE_PAGINATION_BAR_TEXT}>
             {firstRowNumber === 0 ? 0 : `${firstRowNumber}–${lastRowNumber}`} of {rowCount}
@@ -83,34 +153,11 @@ export function TablePaginationBar({
           {knownPageCount !== undefined ? ` of ${knownPageCount}` : ''}
         </span>
         <ButtonGroup>
-          <Button
-            aria-label="First page"
-            disabled={!canPrevious}
-            icon="double-chevron-left"
-            onClick={() => onPageIndexChange(0)}
-          />
-          <Button
-            aria-label="Previous page"
-            disabled={!canPrevious}
-            icon="chevron-left"
-            onClick={() => onPageIndexChange(pageIndex - 1)}
-          />
-          <Button
-            aria-label="Next page"
-            disabled={!canNext}
-            icon="chevron-right"
-            onClick={() => onPageIndexChange(pageIndex + 1)}
-          />
-          <Button
-            aria-label="Last page"
-            disabled={knownPageCount === undefined || !canNext}
-            icon="double-chevron-right"
-            onClick={() => {
-              if (knownPageCount !== undefined) {
-                onPageIndexChange(knownPageCount - 1);
-              }
-            }}
-          />
+          {renderPageButton('first', 'First page', 'double-chevron-left', canPrevious ? 0 : undefined)}
+          {renderPageButton('previous', 'Previous page', 'chevron-left', canPrevious ? pageIndex - 1 : undefined)}
+          {renderPageButton('next', 'Next page', 'chevron-right', canNext ? pageIndex + 1 : undefined)}
+          {renderPageButton('last', 'Last page', 'double-chevron-right',
+            canNext && knownPageCount !== undefined ? knownPageCount - 1 : undefined)}
         </ButtonGroup>
       </div>
     </div>
