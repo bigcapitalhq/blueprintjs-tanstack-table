@@ -14,11 +14,13 @@ import {
   TABLE_HEADER_ACTIVE,
   TABLE_HEADER_CONTENT,
   TABLE_LAST_IN_ROW,
+  TABLE_NO_WRAP_TEXT,
   TABLE_REORDER_HANDLE,
   TABLE_REORDER_HANDLE_TARGET,
   TABLE_RESIZE_HANDLE,
   TABLE_RESIZE_HANDLE_TARGET,
   TABLE_RESIZE_VERTICAL,
+  TABLE_TRUNCATED_TEXT,
   columnCellIndexClass,
 } from '../common/classes.ts';
 import type {
@@ -97,7 +99,7 @@ export function TableHeadCell<TData extends BP_RowData>({
             onOpenChange={setIsSortMenuOpen}
           />
         )}
-        <div className={TABLE_COLUMN_NAME_TEXT}>
+        <div className={classNames(TABLE_COLUMN_NAME_TEXT, TABLE_TRUNCATED_TEXT, TABLE_NO_WRAP_TEXT)}>
           <LoadableContent loading={loading} variableLength>
             <table.FlexRender header={header} />
           </LoadableContent>
