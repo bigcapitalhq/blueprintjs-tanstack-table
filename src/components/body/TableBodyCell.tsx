@@ -61,7 +61,7 @@ export function TableBodyCell<TData extends BP_RowData>({
   const size = cell.column.getSize();
   const start = cell.column.getStart(columnRegion);
   const canExpand = isExpansionCell && cell.row.getCanExpand?.();
-  const bodyCellClassName = cell.column.columnDef.meta?.bodyCellClassName;
+  const meta = cell.column.columnDef.meta;
   const showExpander = canExpand && !loading;
   const indentation = isExpansionCell && cell.row.depth > 0
     ? { paddingInlineStart: cell.row.depth * 16 }
@@ -92,10 +92,12 @@ export function TableBodyCell<TData extends BP_RowData>({
           [Classes.LOADING]: loading,
           [TABLE_ROW_SELECTED]: cell.row.getIsSelected(),
         },
-        bodyCellClassName,
+        meta?.bodyCellClassName,
         cellProps?.className,
       )}
+      data-vertical-align={meta?.verticalAlign}
       style={{
+        textAlign: meta?.textAlign,
         ...cellProps?.style,
         height: rowHeight,
         left: start,

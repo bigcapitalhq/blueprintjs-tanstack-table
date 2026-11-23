@@ -34,6 +34,7 @@ A Blueprint.js-styled data table for React, built on [TanStack Table v9](https:/
 - **Full TanStack Table v9 option pass-through** — `columns`, `data`, `state`, `on*Change` callbacks, and every other table option are forwarded to `useReactTable`.
 - **Loading skeletons** — render skeleton placeholders in the cells, column headers, and/or row headers (`loadingOptions`).
 - **Column `meta` classnames** — style individual columns' body and header cells via `meta.bodyCellClassName` / `meta.headCellClassName`.
+- **Column text alignment** — set `meta: { textAlign: 'end', verticalAlign: 'middle' }` on a column to align its header and body text together. Both options are independent. `textAlign` accepts `start`, `end`, `left`, `center`, or `right`. `verticalAlign` accepts `top`, `middle`, or `bottom`.
 
 ## Requirements
 
@@ -501,6 +502,7 @@ Things worth knowing:
 | `ControlledRowDetails` | Control row details with the carets and expand-all or collapse-all buttons. |
 | `ExpandingSubRows` | Expand a parent to see its child rows. |
 | `ColumnGroups` | Nested column definitions on a second header row. |
+| `Column Alignment/Amount Column` | Change `textAlign` and `verticalAlign` in Controls to align the Amount header and its values. |
 | `Loading` | Skeleton placeholders in cells, column headers, and row headers. |
 | `GhostCells` | Empty ghost cells fill leftover space when the table is smaller than its viewport. |
 | `FocusSelection` | Click/drag selection, Ctrl/Cmd multi-range, row/column/corner-header selection, arrow-key focus, Shift+arrows, Cmd/Ctrl+A, Escape. |

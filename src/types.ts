@@ -29,6 +29,10 @@ declare module '@tanstack/react-table' {
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- parameters must match TanStack's ColumnMeta signature for merging
   interface ColumnMeta<in out TFeatures extends TableFeatures, in out TData extends RowData, TValue extends CellData = CellData> {
+    /** Horizontal text alignment for this column's header and body cells. */
+    textAlign?: 'start' | 'end' | 'left' | 'center' | 'right';
+    /** Vertical text alignment for this column's header and body cells. */
+    verticalAlign?: 'top' | 'middle' | 'bottom';
     /**
      * Additional class name(s) applied to this column's body cells, e.g.
      * `meta: { bodyCellClassName: 'my-cell' }`. Useful for styling cell

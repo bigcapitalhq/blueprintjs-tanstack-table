@@ -59,7 +59,7 @@ export function TableHeadCell<TData extends BP_RowData>({
   const isReorderable = reorder?.enableColumnReordering ?? false;
   const isReordering = reorder?.reorderingColumnId === header.column.id;
   const canSort = enableSorting && header.column.getCanSort();
-  const headCellClassName = header.column.columnDef.meta?.headCellClassName;
+  const meta = header.column.columnDef.meta;
   const [isSortMenuOpen, setIsSortMenuOpen] = useState(false);
   // `header.index` is relative to the pinning region the header was built for;
   // classes and selection operate on the natural column index.
@@ -75,12 +75,12 @@ export function TableHeadCell<TData extends BP_RowData>({
         { [TABLE_HAS_REORDER_HANDLE]: isReorderable },
         { [TABLE_HEADER_ACTIVE]: isSortMenuOpen },
         { [Classes.LOADING]: loading },
-        headCellClassName,
+        meta?.headCellClassName,
       )}
       style={{ flexBasis: size, minWidth: 0, width: size }}
       onMouseDown={(event) => selection?.handleColumnHeaderMouseDown(columnIndex, event)}
     >
-      <div className={TABLE_COLUMN_NAME} title={name}>
+      <div className={TABLE_COLUMN_NAME} title={name} data-vertical-align={meta?.verticalAlign}>
         {isReorderable && (
           <div
             className={classNames(TABLE_REORDER_HANDLE_TARGET, { [TABLE_DRAGGING]: isReordering })}
@@ -99,7 +99,10 @@ export function TableHeadCell<TData extends BP_RowData>({
             onOpenChange={setIsSortMenuOpen}
           />
         )}
-        <div className={classNames(TABLE_COLUMN_NAME_TEXT, TABLE_TRUNCATED_TEXT, TABLE_NO_WRAP_TEXT)}>
+        <div
+          className={classNames(TABLE_COLUMN_NAME_TEXT, TABLE_TRUNCATED_TEXT, TABLE_NO_WRAP_TEXT)}
+          style={{ textAlign: meta?.textAlign }}
+        >
           <LoadableContent loading={loading} variableLength>
             <table.FlexRender header={header} />
           </LoadableContent>
