@@ -430,6 +430,7 @@ navigation are owned by the caller.
 | `enableColumnReordering` | `boolean` | `false` | Drag column headers to reorder columns. |
 | `enableSorting` | `boolean` | `false` | Chevron sort menu on sortable headers; also enables TanStack sorting. |
 | `enableFocusedCell` | `boolean` | `false` | Focused cell with keyboard navigation and selection (arrow keys, Shift+arrows, Tab, Cmd/Ctrl+A, Escape). |
+| `enableCopyOnSelect` | `boolean` | `false` | Press Ctrl+C (Cmd+C on macOS) to copy the selected cells for pasting into Google Sheets or Excel. |
 | `enableGhostCells` | `boolean` | `false` | Fill leftover viewport space with empty cells (body, column headers, row headers) when the content doesn't overflow; scrolling is disabled on filled axes. |
 | `bodyContextMenuRenderer` | `(context: BP_MenuContext<TData>) => ReactElement \| null \| undefined` | — | Render a custom context menu when right-clicking a body cell. |
 | `enableBodyContextMenu` | `boolean` | `true` when a renderer is set | Whether the body context menu is enabled. |
@@ -455,6 +456,12 @@ navigation are owned by the caller.
 | `htmlProps` | `HTMLPropsRef<HTMLDivElement>` | — | Standard HTML attributes spread onto the table's outer container `<div>`; `className` is merged with the container classes, and `ref` points at the container (not the scroll viewport). |
 
 ## Cell selection
+
+To enable clipboard copying, pass `<BP_Table data={data} columns={columns} enableCopyOnSelect />`.
+Select a range and press Ctrl+C or Cmd+C. The table copies accessor values from the current page
+in display order, with tabs between selected cells and newlines between selected rows.
+Unselected cells and rows are skipped. Selected empty cells stay blank. This also works with row virtualization and with
+`enableFocusedCell` turned off.
 
 Cell-range selection is backed by TanStack Table's built-in
 `cellSelectionFeature` plugin: the plugin owns the selection state and the
@@ -498,6 +505,7 @@ Things worth knowing:
 | --- | --- |
 | `Basic` | Minimal table with column reordering. |
 | `AccountCellClicks` | Open account details from any data cell and style inactive rows. |
+| `Clipboard / Cell Range`, `Separate Cells`, `Copy Disabled` | Try a rectangular or disjoint selection, paste the result, and inspect the copy and paste events in the on-screen log. |
 | `RowDetails` | Expand a person to read their biography. |
 | `ControlledRowDetails` | Control row details with the carets and expand-all or collapse-all buttons. |
 | `ExpandingSubRows` | Expand a parent to see its child rows. |

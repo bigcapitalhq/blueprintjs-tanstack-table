@@ -105,6 +105,8 @@ export type BP_TableProps<TData extends BP_RowData> =
      * @default false
      */
     enableFocusedCell?: boolean;
+    /** Copy selected cell values as spreadsheet-ready text with Ctrl/Cmd+C. @default false */
+    enableCopyOnSelect?: boolean;
     /**
      * If `true`, empty space in the table container will be filled with empty
      * cells instead of a blank background. Ghost cells render in the body, the
@@ -285,6 +287,7 @@ export function BP_Table<TData extends BP_RowData>({
   enableSorting = false,
   loadingOptions = [],
   enableFocusedCell = false,
+  enableCopyOnSelect = false,
   enableGhostCells = false,
   bodyContextMenuRenderer,
   enableBodyContextMenu,
@@ -384,6 +387,7 @@ export function BP_Table<TData extends BP_RowData>({
       areColumnHeadersLoading={areColumnHeadersLoading}
       areRowHeadersLoading={areRowHeadersLoading}
       enableFocusedCell={enableFocusedCell}
+      enableCopyOnSelect={enableCopyOnSelect}
       enableGhostCells={enableGhostCells}
       bodyContextMenuRenderer={bodyContextMenuRenderer}
       enableBodyContextMenu={enableBodyContextMenu}

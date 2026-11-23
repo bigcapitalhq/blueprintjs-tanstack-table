@@ -199,6 +199,41 @@ export function getSelectedCellRegions<TData extends BP_RowData>(
   return regions;
 }
 
+/** TSV of only the selected cells on this page, including virtualized rows. */
+export function getSelectedCellText<TData extends BP_RowData>(
+  table: BP_TableInstance<TData>,
+): string | undefined {
+  const bounds = table.getCellSelectionBounds();
+  if (bounds.length === 0) return undefined;
+
+  const rows = table.getRowModel().rows;
+  const columns = getDisplayOrderedColumns(table);
+  const fields: string[][] = [];
+
+  for (const bound of bounds) {
+    const interval = mapDisplayRowInterval(rows, bound.minRowIndex, bound.maxRowIndex);
+    if (interval == null) continue;
+    for (let r = interval[0]; r <= interval[1]; r++) {
+      const cells = rows[r].getAllCellsByColumnId();
+      for (let c = bound.minColumnIndex; c <= bound.maxColumnIndex; c++) {
+        const cell = cells[columns[c].id];
+        if (!cell.getCanSelect()) continue;
+        const value = String(cell.getValue() ?? '');
+        const rowFields = fields[r] ??= [];
+        rowFields[c] = /[\t\r\n"]/.test(value)
+          ? '"' + value.replace(/"/g, '""') + '"'
+          : value;
+      }
+    }
+  }
+  if (fields.length === 0) return undefined;
+
+  // Enumerating populated indexes skips gaps while preserving selected empty strings.
+  return Object.values(fields)
+    .map((row) => Object.values(row).join('\t'))
+    .join('\n');
+}
+
 /**
  * Converts Blueprint `Region`s into the cell selection plugin's
  * `CellSelectionRange` list. Full-row/column/table regions are emulated as

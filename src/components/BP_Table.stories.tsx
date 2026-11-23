@@ -206,6 +206,7 @@ export const FocusSelection: Story = {
     columns,
     enableColumnReordering: true,
     enableFocusedCell: true,
+    enableCopyOnSelect: true,
   },
   decorators: [
     (Story) => (
@@ -215,7 +216,8 @@ export const FocusSelection: Story = {
           Click a cell to focus/select. Drag to select a range, Shift-click to extend, and
           Ctrl/Cmd-click or drag to add/subtract ranges. Click row/column headers or the corner
           menu to select rows/columns/all. Arrow keys move focus; Shift+arrows extend the
-          selection; Tab moves focus; Cmd/Ctrl+A selects all; Escape clears.
+          selection. Tab moves focus, Cmd/Ctrl+A selects all, and Escape clears the selection.
+          Press Cmd/Ctrl+C to copy the selected cells, then paste into a spreadsheet.
         </p>
       </div>
     ),
