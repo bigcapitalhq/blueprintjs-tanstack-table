@@ -12,6 +12,8 @@ import { DEFAULT_PAGE_SIZE_OPTIONS } from './constants.ts';
 type PageAction = 'first' | 'previous' | 'next' | 'last';
 
 export type PaginationControlProps = {
+  /** Show the first and last page buttons. Defaults to true. */
+  paginationWithEdges?: boolean;
   /** Shared navigation button props, or a function that returns props for each action. */
   paginationButtonProps?: ButtonProps | ((action: PageAction) => ButtonProps);
   /** Blueprint Select props for the rows-per-page menu. Use pageSizeOptions to supply its items. */
@@ -56,6 +58,7 @@ export function TablePaginationBar({
   pageCount,
   rowCount,
   pageSizeOptions = DEFAULT_PAGE_SIZE_OPTIONS,
+  paginationWithEdges = true,
   paginationButtonProps,
   pageSizeSelectProps,
   pageSizeButtonProps,
@@ -147,10 +150,10 @@ export function TablePaginationBar({
           </span>
         )}
         <ButtonGroup>
-          {renderPageButton('first', 'First page', 'double-chevron-left', canPrevious ? 0 : undefined)}
+          {paginationWithEdges && renderPageButton('first', 'First page', 'double-chevron-left', canPrevious ? 0 : undefined)}
           {renderPageButton('previous', 'Previous page', 'chevron-left', canPrevious ? pageIndex - 1 : undefined)}
           {renderPageButton('next', 'Next page', 'chevron-right', canNext ? pageIndex + 1 : undefined)}
-          {renderPageButton('last', 'Last page', 'double-chevron-right',
+          {paginationWithEdges && renderPageButton('last', 'Last page', 'double-chevron-right',
             canNext && knownPageCount !== undefined ? knownPageCount - 1 : undefined)}
         </ButtonGroup>
       </div>

@@ -337,6 +337,7 @@ Pagination options (on top of every `BP_TableProps`):
 | `initialPageIndex` | `number` | `0` | Initial zero-based page index for uncontrolled pagination. |
 | `pageSizeOptions` | `readonly number[]` | `[10, 20, 50, 100]` | Page sizes offered by the bar's select. |
 | `showPaginationBar` | `boolean` | `true` | Hide the bar while keeping the table paginated. |
+| `paginationWithEdges` | `boolean` | `true` | Show the first and last page buttons. Set to `false` for previous and next buttons only. |
 | `paginationBarClassName` | `string` | — | Class name(s) for the pagination bar. |
 
 Both `PaginatedTable` and `TablePaginationBar` accept Blueprint props for their controls:
@@ -354,7 +355,7 @@ Both `PaginatedTable` and `TablePaginationBar` accept Blueprint props for their 
 />
 ```
 
-Pass a single `ButtonProps` object to style all four navigation buttons, or
+Pass a single `ButtonProps` object to style all visible navigation buttons, or
 use the callback to customize `first`, `previous`, `next`, and `last` individually.
 A button's `onClick` runs before navigation and can cancel it with `event.preventDefault()`.
 Use `pageSizeOptions` to set the select's items.
@@ -411,6 +412,7 @@ navigation are owned by the caller.
 | --- | --- | --- | --- |
 | `pageIndex` | `number` | — | Zero-based index of the current page. |
 | `pageSize` | `number` | — | Number of rows shown per page. |
+| `paginationWithEdges` | `boolean` | `true` | Show the first and last page buttons. |
 | `pageCount` | `number` | — | Total number of pages. `undefined` means the count is unknown (typical for manual pagination without `rowCount`): "last" navigation is disabled and "next" stays enabled. |
 | `rowCount` | `number` | — | Total number of rows across all pages, used for the "1–10 of 240" summary. When `undefined`, the summary is omitted. |
 | `pageSizeOptions` | `readonly number[]` | `[10, 20, 50, 100]` | Page sizes offered by the rows-per-page select. |

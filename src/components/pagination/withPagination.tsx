@@ -91,6 +91,7 @@ export function withPagination<TData extends BP_RowData>(
     initialPageIndex = 0,
     initialPageSize = DEFAULT_PAGE_SIZE,
     pageSizeOptions,
+    paginationWithEdges,
     paginationButtonProps,
     pageSizeSelectProps,
     pageSizeButtonProps,
@@ -212,6 +213,7 @@ export function withPagination<TData extends BP_RowData>(
             pageIndex={pageIndex}
             pageSize={pageSize}
             pageSizeOptions={pageSizeOptions}
+            paginationWithEdges={paginationWithEdges}
             paginationButtonProps={paginationButtonProps}
             pageSizeSelectProps={pageSizeSelectProps}
             pageSizeButtonProps={pageSizeButtonProps}
