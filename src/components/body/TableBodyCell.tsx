@@ -97,6 +97,7 @@ export function TableBodyCell<TData extends BP_RowData>({
       )}
       data-vertical-align={meta?.verticalAlign}
       style={{
+        fontVariantNumeric: meta?.tabularNums ? 'tabular-nums' : undefined,
         textAlign: meta?.textAlign,
         ...cellProps?.style,
         height: rowHeight,

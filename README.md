@@ -35,6 +35,7 @@ A Blueprint.js-styled data table for React, built on [TanStack Table v9](https:/
 - **Loading skeletons** — render skeleton placeholders in the cells, column headers, and/or row headers (`loadingOptions`).
 - **Column `meta` classnames** — style individual columns' body and header cells via `meta.bodyCellClassName` / `meta.headCellClassName`.
 - **Column text alignment** — set `meta: { textAlign: 'end', verticalAlign: 'middle' }` on a column to align its header and body text together. Both options are independent. `textAlign` accepts `start`, `end`, `left`, `center`, or `right`. `verticalAlign` accepts `top`, `middle`, or `bottom`.
+- **Tabular numbers** — set `meta: { tabularNums: true }` on a column to render its header and body text with `font-variant-numeric: tabular-nums`, so digits line up from row to row in numeric and currency columns.
 
 ## Requirements
 
@@ -511,6 +512,7 @@ Things worth knowing:
 | `ExpandingSubRows` | Expand a parent to see its child rows. |
 | `ColumnGroups` | Nested column definitions on a second header row. |
 | `Column Alignment/Amount Column` | Change `textAlign` and `verticalAlign` in Controls to align the Amount header and its values. |
+| `Column Tabular Nums/Amount Columns` | Toggle `tabularNums` in Controls to render the Quantity, Unit Price, and Amount columns with `font-variant-numeric: tabular-nums`. |
 | `Loading` | Skeleton placeholders in cells, column headers, and row headers. |
 | `GhostCells` | Empty ghost cells fill leftover space when the table is smaller than its viewport. |
 | `FocusSelection` | Click/drag selection, Ctrl/Cmd multi-range, row/column/corner-header selection, arrow-key focus, Shift+arrows, Cmd/Ctrl+A, Escape. |
