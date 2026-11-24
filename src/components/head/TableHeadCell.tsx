@@ -101,7 +101,10 @@ export function TableHeadCell<TData extends BP_RowData>({
         )}
         <div
           className={classNames(TABLE_COLUMN_NAME_TEXT, TABLE_TRUNCATED_TEXT, TABLE_NO_WRAP_TEXT)}
-          style={{ textAlign: meta?.textAlign }}
+          style={{
+            fontVariantNumeric: meta?.tabularNums ? 'tabular-nums' : undefined,
+            textAlign: meta?.textAlign,
+          }}
         >
           <LoadableContent loading={loading} variableLength>
             <table.FlexRender header={header} />

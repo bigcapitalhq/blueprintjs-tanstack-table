@@ -34,6 +34,12 @@ declare module '@tanstack/react-table' {
     /** Vertical text alignment for this column's header and body cells. */
     verticalAlign?: 'top' | 'middle' | 'bottom';
     /**
+     * Render this column's header and body text with tabular (monospaced)
+     * figures via `font-variant-numeric: tabular-nums`, keeping digits aligned
+     * from row to row. Useful for numeric and currency columns.
+     */
+    tabularNums?: boolean;
+    /**
      * Additional class name(s) applied to this column's body cells, e.g.
      * `meta: { bodyCellClassName: 'my-cell' }`. Useful for styling cell
      * contents (centering editors, removing cell padding, and so on).
