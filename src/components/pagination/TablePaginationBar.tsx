@@ -135,7 +135,7 @@ export function TablePaginationBar({
         >
           <Button
             aria-label={`Rows per page: ${pageSize}`}
-            endIcon="double-caret-vertical"
+            endIcon="caret-down"
             text={pageSize}
             {...pageSizeButtonProps}
             disabled={pageSizeDisabled}
@@ -146,12 +146,6 @@ export function TablePaginationBar({
             {firstRowNumber === 0 ? 0 : `${firstRowNumber}–${lastRowNumber}`} of {rowCount}
           </span>
         )}
-      </div>
-      <div className={TABLE_PAGINATION_BAR_CONTROLS}>
-        <span className={TABLE_PAGINATION_BAR_TEXT}>
-          Page {pageIndex + 1}
-          {knownPageCount !== undefined ? ` of ${knownPageCount}` : ''}
-        </span>
         <ButtonGroup>
           {renderPageButton('first', 'First page', 'double-chevron-left', canPrevious ? 0 : undefined)}
           {renderPageButton('previous', 'Previous page', 'chevron-left', canPrevious ? pageIndex - 1 : undefined)}

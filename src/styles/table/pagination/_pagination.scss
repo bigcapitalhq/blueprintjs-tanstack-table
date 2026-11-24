@@ -22,9 +22,7 @@
   color: $cell-text-color;
   display: flex;
   flex: 0 0 auto;
-  flex-wrap: wrap;
-  gap: $pt-spacing ($pt-spacing * 4);
-  justify-content: space-between;
+  justify-content: flex-end;
   min-height: $pt-spacing * 9;
   padding: $pt-spacing ($pt-spacing * 2);
   user-select: none;
@@ -39,7 +37,9 @@
 .#{$ns}-table-pagination-bar-controls {
   align-items: center;
   display: flex;
-  gap: $pt-spacing * 2;
+  flex-wrap: wrap;
+  gap: $pt-spacing ($pt-spacing * 2);
+  justify-content: flex-end;
 }
 
 .#{$ns}-table-pagination-bar-text {
