@@ -68,7 +68,11 @@ export function TableBodyCell<TData extends BP_RowData>({
     : undefined;
   const content = (
     <div
-      className={classNames(TABLE_TRUNCATED_TEXT, TABLE_NO_WRAP_TEXT)}
+      className={classNames(
+        TABLE_TRUNCATED_TEXT,
+        TABLE_NO_WRAP_TEXT,
+        meta?.bodyCellInnerClassName,
+      )}
       style={showExpander ? undefined : indentation}
     >
       <LoadableContent loading={loading} variableLength>

@@ -100,7 +100,12 @@ export function TableHeadCell<TData extends BP_RowData>({
           />
         )}
         <div
-          className={classNames(TABLE_COLUMN_NAME_TEXT, TABLE_TRUNCATED_TEXT, TABLE_NO_WRAP_TEXT)}
+          className={classNames(
+            TABLE_COLUMN_NAME_TEXT,
+            TABLE_TRUNCATED_TEXT,
+            TABLE_NO_WRAP_TEXT,
+            meta?.headCellInnerClassName,
+          )}
           style={{
             fontVariantNumeric: meta?.tabularNums ? 'tabular-nums' : undefined,
             textAlign: meta?.textAlign,
