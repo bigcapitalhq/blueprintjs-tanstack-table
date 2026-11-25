@@ -45,8 +45,19 @@ declare module '@tanstack/react-table' {
      * contents (centering editors, removing cell padding, and so on).
      */
     bodyCellClassName?: string;
+    /**
+     * Additional class name(s) applied to the inner wrapper of this column's
+     * body cells, around the rendered cell value. Useful for styling the
+     * value itself rather than the whole cell.
+     */
+    bodyCellInnerClassName?: string;
     /** Additional class name(s) applied to this column's header cells. */
     headCellClassName?: string;
+    /**
+     * Additional class name(s) applied to the inner wrapper of this column's
+     * header cells, around the rendered header content.
+     */
+    headCellInnerClassName?: string;
     /**
      * Additional class name(s) applied to this column's footer cells.
      * Reserved for forward compatibility: the table does not render footers

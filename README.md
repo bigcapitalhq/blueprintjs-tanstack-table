@@ -33,7 +33,7 @@ A Blueprint.js-styled data table for React, built on [TanStack Table v9](https:/
 - **Row virtualization** — only the visible rows (plus an overscan buffer) are rendered, so the table scales to tens of thousands of rows (`enableRowVirtualization`, `overscanRowCount`).
 - **Full TanStack Table v9 option pass-through** — `columns`, `data`, `state`, `on*Change` callbacks, and every other table option are forwarded to `useReactTable`.
 - **Loading skeletons** — render skeleton placeholders in the cells, column headers, and/or row headers (`loadingOptions`).
-- **Column `meta` classnames** — style individual columns' body and header cells via `meta.bodyCellClassName` / `meta.headCellClassName`.
+- **Column `meta` classnames** — style individual columns' outer body and header cells via `meta.bodyCellClassName` / `meta.headCellClassName`, or their inner content wrappers via `meta.bodyCellInnerClassName` / `meta.headCellInnerClassName`.
 - **Column text alignment** — set `meta: { textAlign: 'end', verticalAlign: 'middle' }` on a column to align its header and body text together. Both options are independent. `textAlign` accepts `start`, `end`, `left`, `center`, or `right`. `verticalAlign` accepts `top`, `middle`, or `bottom`.
 - **Tabular numbers** — set `meta: { tabularNums: true }` on a column to render its header and body text with `font-variant-numeric: tabular-nums`, so digits line up from row to row in numeric and currency columns.
 
@@ -225,6 +225,20 @@ places the account’s test ID on its account-number cell.
 
 Cell classes are merged with the column’s `meta.bodyCellClassName`. The table
 controls each cell’s position and dimensions.
+
+Each body cell and column header has two styling targets: the outer cell
+element and the inner wrapper around the rendered content. Use
+`bodyCellInnerClassName` / `headCellInnerClassName` to style the content itself
+without affecting padding, borders, or other cell-level styling.
+
+```tsx
+meta: {
+  bodyCellClassName: 'amount-cell', // outer cell: padding and borders
+  bodyCellInnerClassName: 'amount-value', // inner wrapper: the rendered value
+  headCellClassName: 'amount-header-cell',
+  headCellInnerClassName: 'amount-header-value',
+}
+```
 
 ### Expandable rows
 
