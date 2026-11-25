@@ -4,6 +4,7 @@ import { LoadableContent } from '../common/LoadableContent.tsx';
 import {
   TABLE_CELL,
   TABLE_CELL_GHOST,
+  TABLE_CELL_GHOST_ROW,
   TABLE_CELL_LEDGER_EVEN,
   TABLE_CELL_LEDGER_ODD,
   TABLE_NO_WRAP_TEXT,
@@ -18,6 +19,7 @@ export type TableGhostCellProps = {
   columnIndex: number;
   /** Absolute row index (data rows first, then ghost rows). */
   rowIndex: number;
+  isGhostRow?: boolean;
   /** Absolute left offset within the body's virtual client. */
   left: number;
   /** Absolute top offset within the body's virtual client. */
@@ -36,6 +38,7 @@ export type TableGhostCellProps = {
 export function TableGhostCell({
   columnIndex,
   rowIndex,
+  isGhostRow,
   left,
   top,
   width,
@@ -51,7 +54,7 @@ export function TableGhostCell({
         rowCellIndexClass(rowIndex),
         columnCellIndexClass(columnIndex),
         rowIndex % 2 === 0 ? TABLE_CELL_LEDGER_EVEN : TABLE_CELL_LEDGER_ODD,
-        { [Classes.LOADING]: loading },
+        { [TABLE_CELL_GHOST_ROW]: isGhostRow, [Classes.LOADING]: loading },
       )}
       style={{ height, left, position: 'absolute', top, width }}
     >

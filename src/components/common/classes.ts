@@ -14,6 +14,7 @@ export const TABLE_BOTTOM_CONTAINER = `${NS}-table-bottom-container`;
 export const TABLE_CELL = `${NS}-table-cell`;
 export const TABLE_CELL_CLIENT = `${NS}-table-cell-client`;
 export const TABLE_CELL_GHOST = `${NS}-table-cell-ghost`;
+export const TABLE_CELL_GHOST_ROW = `${NS}-table-cell-ghost-row`;
 export const TABLE_CELL_INTERACTIVE = `${NS}-table-cell-interactive`;
 export const TABLE_CELL_LEDGER_EVEN = `${NS}-table-cell-ledger-even`;
 export const TABLE_CELL_LEDGER_ODD = `${NS}-table-cell-ledger-odd`;

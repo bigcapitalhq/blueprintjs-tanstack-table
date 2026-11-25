@@ -93,6 +93,7 @@ export function TableGhostCells<TData extends BP_RowData>({
               {regionColumns.map((column) => (
                 <TableGhostCell
                   key={`ghost-row-cell-${ghostRowOffset}-${column.id}`}
+                  isGhostRow
                   columnIndex={column.getIndex()}
                   rowIndex={rowIndex}
                   left={column.getStart(columnRegion)}
@@ -106,6 +107,7 @@ export function TableGhostCells<TData extends BP_RowData>({
                 Array.from({ length: ghosts.columnCount }).map((_, ghostColumnOffset) => (
                   <TableGhostCell
                     key={`ghost-corner-cell-${ghostRowOffset}-${ghostColumnOffset}`}
+                    isGhostRow
                     columnIndex={numColumns + ghostColumnOffset}
                     rowIndex={rowIndex}
                     left={regionWidth + ghostColumnOffset * ghosts.columnWidth}
