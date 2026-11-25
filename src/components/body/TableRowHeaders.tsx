@@ -2,6 +2,7 @@ import classNames from 'classnames';
 import { Classes } from '@blueprintjs/core';
 import { LoadableContent } from '../common/LoadableContent.tsx';
 import {
+  TABLE_CELL_GHOST_ROW,
   TABLE_HEADER,
   TABLE_ROW_HEADERS,
   TABLE_ROW_HEADERS_CELLS_CONTAINER,
@@ -134,7 +135,7 @@ export function TableRowHeaders<TData extends BP_RowData>({
               {ghostRowIndices.map((rowIndex, ghostRowOffset) => (
                 <div
                   key={`ghost-row-header-${ghostRowOffset}`}
-                  className={classNames(TABLE_HEADER, rowCellIndexClass(rowIndex), {
+                  className={classNames(TABLE_HEADER, TABLE_CELL_GHOST_ROW, rowCellIndexClass(rowIndex), {
                     [Classes.LOADING]: areRowHeadersLoading,
                   })}
                   style={{ flexBasis: ghosts?.rowHeight, height: ghosts?.rowHeight, minHeight: 0 }}
@@ -166,9 +167,13 @@ export function TableRowHeaders<TData extends BP_RowData>({
               {ghostRowIndices.map((rowIndex, ghostRowOffset) => (
                 <div
                   key={`ghost-row-selection-${ghostRowOffset}`}
-                  className={classNames(TABLE_HEADER, TABLE_ROW_SELECTION_CELL, rowCellIndexClass(rowIndex), {
-                    [Classes.LOADING]: areRowHeadersLoading,
-                  })}
+                  className={classNames(
+                    TABLE_HEADER,
+                    TABLE_ROW_SELECTION_CELL,
+                    TABLE_CELL_GHOST_ROW,
+                    rowCellIndexClass(rowIndex),
+                    { [Classes.LOADING]: areRowHeadersLoading },
+                  )}
                   style={{ height: ghosts?.rowHeight }}
                 />
               ))}

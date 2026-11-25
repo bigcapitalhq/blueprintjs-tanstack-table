@@ -13,7 +13,7 @@ A Blueprint.js-styled data table for React, built on [TanStack Table v9](https:/
 - **Frozen columns & rows** — freeze the leftmost columns (`numFrozenColumns`) and topmost rows (`numFrozenRows`) in place while the rest of the body scrolls, mirroring Blueprint's frozen areas. The column headers and row headers are always frozen, and frozen areas stay correct across column reordering, column visibility, and sorting.
 - **Blueprint.js v6 skin** — cells, headers, selection overlays, and resize/reorder guides all use Blueprint colors and classes, so the table fits naturally into existing Blueprint apps.
 - **Grouped column headers** — nested column definitions render on additional header rows; each group spans its child columns.
-- **Ghost cells** — when the content is smaller than the viewport, leftover space is filled with empty cells (body, column headers, and row headers) instead of a blank background, and scrolling is disabled on the filled axes (`enableGhostCells`).
+- **Ghost cells** — when the content is smaller than the viewport, leftover space is filled with empty cells (body, column headers, and row headers) instead of a blank background, and scrolling is disabled on the filled axes (`enableGhostCells`). Use `.bp6-table-cell-ghost-row` to style every cell in a filler row below the data, including its row header and selection cell.
 
 ### Interactivity
 
